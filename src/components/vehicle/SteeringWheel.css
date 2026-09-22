@@ -1,0 +1,49 @@
+.wheel-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 0;
+}
+
+.wheel-arc-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 30vw;
+  max-width: 300px;
+  margin-bottom: -8.8vh;
+}
+
+.wheel-arc-svg {
+  width: 30vw;
+  max-width: 270px;
+  display: block;
+  overflow: visible;
+}
+
+/* Clip container — wheel touches bottom */
+.wheel-container {
+  position: relative;
+  width: 24vw;
+  max-width: 240px;
+  height: 19vw;
+  max-height: 190px;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-top: -2vw;
+}
+
+.wheel-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 24vw;
+  max-width: 240px;
+  height: auto;
+  transition: transform 0.15s ease;
+}

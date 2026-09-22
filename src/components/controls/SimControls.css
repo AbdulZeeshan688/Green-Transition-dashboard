@@ -1,0 +1,110 @@
+.simctrl-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vh;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.simctrl-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vh;
+  width: 100%;
+}
+
+.simctrl-label {
+  font-size: 0.6vw;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-family: var(--mono);
+  text-align: left;
+}
+
+/* Gear buttons */
+.simctrl-gears {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6vw;
+  width: 100%;
+}
+
+.simctrl-gear-btn {
+  width: 2.8vw;
+  height: 2.8vw;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 1vw;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.simctrl-gear-btn:hover {
+  border-color: var(--label);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.simctrl-gear-btn:active {
+  transform: scale(0.95);
+}
+
+.simctrl-gear-btn.active {
+  background: transparent;
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.25);
+}
+
+/* Drive mode buttons — big and easy to hit */
+.simctrl-modes {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.5vw;
+  width: 100%;
+}
+
+.simctrl-mode-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 0.75vh 0.4vw;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 0.75vw;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.simctrl-mode-btn:hover {
+  border-color: var(--label);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.simctrl-mode-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #06251f;
+  box-shadow: 0 0 16px rgba(0, 212, 170, 0.45);
+}
+
+.simctrl-mode-btn:active {
+  transform: scale(0.98);
+}
