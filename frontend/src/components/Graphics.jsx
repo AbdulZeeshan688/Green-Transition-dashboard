@@ -75,6 +75,19 @@ export function CarRear() {
   );
 }
 
+// Uses the vehicle's photo from vehicles.json ("image", relative to public/),
+// falling back to the drawn silhouette for vehicles without one.
+export function CarImage({ vehicle }) {
+  if (!vehicle.image) return <CarSide />;
+  return (
+    <img
+      className="car-photo"
+      src={`${import.meta.env.BASE_URL}${vehicle.image}`}
+      alt={`${vehicle.make} ${vehicle.model}`}
+    />
+  );
+}
+
 export function CarSide() {
   return (
     <svg viewBox="0 0 400 150" className="car-side-svg" aria-hidden="true">

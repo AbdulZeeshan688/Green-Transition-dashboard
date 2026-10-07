@@ -1,6 +1,6 @@
 // Validates the editable JSON files so a typo by anyone editing them is caught
 // by `npm test` instead of breaking the dashboard at runtime.
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../public/data/${name}.json`, import.meta.url), 'utf8'));
@@ -24,6 +24,9 @@ describe('data files', () => {
       for (const key of ['batteryCapacity', 'energyConsumption', 'maxSpeedKmh']) {
         expect(positive(v[key]), `${v.registrationNumber}.${key}`).toBe(true);
       }
+    }
+    for (const v of vehicles.filter((x) => x.image)) {
+      expect(existsSync(new URL(`../public/${v.image}`, import.meta.url)), `${v.registrationNumber}.image`).toBe(true);
     }
     for (const key of ['maxReverseKmh', 'maxBrakeDecelMs2', 'maxSteeringDeg']) {
       expect(positive(sim.vehicleDefaults[key]), key).toBe(true);
