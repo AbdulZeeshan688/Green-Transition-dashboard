@@ -8,6 +8,7 @@
     "batteryCapacity": 78,
     "energyConsumption": 17.1,
     "maxSpeedKmh": 160,
+    "image": "images/polestar-2.png",
     "specSource": "ev-database.org (MY21-22, WLTP)"
   },
   {

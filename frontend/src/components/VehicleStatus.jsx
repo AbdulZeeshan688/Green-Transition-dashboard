@@ -1,4 +1,4 @@
-import { CarSide } from './Graphics';
+import { CarImage } from './Graphics';
 import { estimateRangeKm } from '../lib/energyModel';
 import { fmt } from '../lib/format';
 
@@ -42,7 +42,7 @@ export default function VehicleStatus({ units, vehicles, vehicle, onVehicleChang
             {vehicle.variant} · {vehicle.propulsion}
           </p>
         </div>
-        <CarSide />
+        <CarImage vehicle={vehicle} />
       </div>
       <div className="kv-columns">
         <div>

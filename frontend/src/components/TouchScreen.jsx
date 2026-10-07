@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Icon from './Icon';
-import { CarSide } from './Graphics';
+import { CarImage } from './Graphics';
 import { fmt } from '../lib/format';
 
 function useClock() {
@@ -59,7 +59,7 @@ export default function TouchScreen({ ui, vehicle, rangeKm, cabinTempC, onTempCh
                   </p>
                   <p className="muted">Range</p>
                 </div>
-                <CarSide />
+                <CarImage vehicle={vehicle} />
               </div>
 
               <div className="tile-grid">
