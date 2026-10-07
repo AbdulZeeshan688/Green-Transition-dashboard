@@ -1,0 +1,36 @@
+{
+  "brand": "POLYSTAR",
+  "appTitle": "GREEN TRANSITION DASHBOARD",
+  "tabs": [
+    { "id": "dashboard", "label": "Dashboard", "icon": "grid" },
+    { "id": "route", "label": "Route Evaluation", "icon": "pin" },
+    { "id": "vehicle", "label": "Vehicle Status", "icon": "car" }
+  ],
+  "touchscreen": {
+    "sideNav": [
+      { "id": "home", "label": "Home", "icon": "home" },
+      { "id": "drive", "label": "Drive", "icon": "car", "opensTab": "vehicle" },
+      { "id": "climate", "label": "Climate", "icon": "fan" },
+      { "id": "settings", "label": "Settings", "icon": "gear" }
+    ],
+    "tiles": [
+      { "id": "vehicle", "title": "Vehicle", "subtitle": "Vehicle settings", "icon": "car", "opensTab": "vehicle" },
+      { "id": "interior", "title": "Interior", "subtitle": "Cabin and seating", "icon": "seat" },
+      { "id": "exterior", "title": "Exterior", "subtitle": "Lights and mirrors", "icon": "sun" },
+      { "id": "comfort", "title": "Comfort", "subtitle": "Drive feel and convenience", "icon": "seat" },
+      { "id": "safety", "title": "Safety", "subtitle": "Driver assistance", "icon": "shield" },
+      { "id": "charging", "title": "Charging", "subtitle": "Charge schedule and limits", "icon": "bolt" },
+      { "id": "route", "title": "Route Evaluation", "subtitle": "Compare energy-efficient routes", "icon": "route", "opensTab": "route", "wide": true }
+    ]
+  },
+  "units": {
+    "distance": "km",
+    "speed": "km/h",
+    "energyRate": "kWh/km",
+    "energy": "kWh",
+    "mass": "kg",
+    "elevation": "m",
+    "duration": "min",
+    "temperature": "°"
+  }
+}
