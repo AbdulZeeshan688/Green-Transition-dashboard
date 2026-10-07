@@ -1,0 +1,8 @@
+{
+  "description": "Ranking score shown on route cards (0-100): weighted comparison of each metric against the best candidate. Weights are normalised. CO2 is left out because with one grid factor it is proportional to energy and would be counted twice. The Eco/Fastest labels themselves follow Sanjeev's rule, not this score.",
+  "metrics": [
+    { "key": "energyKWh", "weight": 0.6, "better": "lower" },
+    { "key": "durationMin", "weight": 0.4, "better": "lower" }
+  ],
+  "goodScoreMin": 75
+}

@@ -1,0 +1,5 @@
+[
+  { "id": "eco", "label": "Eco", "icon": "leaf", "maxAccelMs2": 1.8, "coastDecelMs2": 0.6, "regen": true },
+  { "id": "normal", "label": "Normal", "icon": "gauge", "maxAccelMs2": 2.8, "coastDecelMs2": 0.35, "regen": true },
+  { "id": "sport", "label": "Sport", "icon": "gauge", "maxAccelMs2": 4.2, "coastDecelMs2": 0.2, "regen": false }
+]
