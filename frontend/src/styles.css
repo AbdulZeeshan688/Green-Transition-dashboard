@@ -624,6 +624,13 @@ select {
   width: 100%;
 }
 
+.car-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
 .tile-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
