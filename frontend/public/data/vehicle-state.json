@@ -1,0 +1,10 @@
+{
+  "source": "Initial telemetry snapshot. Replace with the live telemetry feed when the data team delivers it.",
+  "registrationNumber": "EV-006",
+  "socPercent": 80,
+  "gear": "P",
+  "driveMode": "normal",
+  "regenEnabled": true,
+  "cabinTempC": 22,
+  "systemOnline": true
+}

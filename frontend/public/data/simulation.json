@@ -1,0 +1,15 @@
+{
+  "tickMs": 50,
+  "pedalRampSeconds": 0.8,
+  "steeringRateDegPerSec": 360,
+  "steeringReturnDegPerSec": 540,
+  "gearChangeMaxKmh": 3,
+  "climateMinC": 16,
+  "climateMaxC": 28,
+  "climateStepC": 0.5,
+  "vehicleDefaults": {
+    "maxReverseKmh": 20,
+    "maxBrakeDecelMs2": 8,
+    "maxSteeringDeg": 540
+  }
+}

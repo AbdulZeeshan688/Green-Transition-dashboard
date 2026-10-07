@@ -1,0 +1,68 @@
+[
+  {
+    "registrationNumber": "EV-006",
+    "make": "Polestar",
+    "model": "2",
+    "variant": "Long Range Single Motor",
+    "propulsion": "Electric",
+    "batteryCapacity": 78,
+    "energyConsumption": 17.1,
+    "maxSpeedKmh": 160,
+    "specSource": "ev-database.org (MY21-22, WLTP)"
+  },
+  {
+    "registrationNumber": "EV-001",
+    "make": "Tesla",
+    "model": "Model 3",
+    "variant": "Long Range",
+    "propulsion": "Electric",
+    "batteryCapacity": 75,
+    "energyConsumption": 16.0,
+    "maxSpeedKmh": 233,
+    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
+  },
+  {
+    "registrationNumber": "EV-002",
+    "make": "Volkswagen",
+    "model": "ID.3",
+    "variant": "Pro",
+    "propulsion": "Electric",
+    "batteryCapacity": 58,
+    "energyConsumption": 16.5,
+    "maxSpeedKmh": 160,
+    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
+  },
+  {
+    "registrationNumber": "EV-003",
+    "make": "Hyundai",
+    "model": "IONIQ 5",
+    "variant": "Long Range",
+    "propulsion": "Electric",
+    "batteryCapacity": 77.4,
+    "energyConsumption": 18.0,
+    "maxSpeedKmh": 185,
+    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
+  },
+  {
+    "registrationNumber": "EV-004",
+    "make": "Kia",
+    "model": "EV6",
+    "variant": "Long Range",
+    "propulsion": "Electric",
+    "batteryCapacity": 77.4,
+    "energyConsumption": 17.5,
+    "maxSpeedKmh": 185,
+    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
+  },
+  {
+    "registrationNumber": "EV-005",
+    "make": "Nissan",
+    "model": "Leaf",
+    "variant": "40 kWh",
+    "propulsion": "Electric",
+    "batteryCapacity": 40,
+    "energyConsumption": 17.1,
+    "maxSpeedKmh": 144,
+    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
+  }
+]

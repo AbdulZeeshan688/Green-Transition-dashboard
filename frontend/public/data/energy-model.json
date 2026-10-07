@@ -1,0 +1,7 @@
+{
+  "source": "Sanjeev-Kumar Chaudhary - Green-Transition-Dashboard-LAB-REDI- (frontend/src/pages/Dashboard.jsx)",
+  "uphillKWhPerM": 0.001,
+  "regenKWhPerM": 0.0005,
+  "gridCo2GPerKWh": 32,
+  "gridCo2Source": "Fingrid half-year report 1-6/2026: emission factor of electricity consumed in Finland. To be replaced by the live Fingrid dataset 265 value relayed by the backend."
+}
