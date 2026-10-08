@@ -20,8 +20,10 @@ export default function DriverDisplay({
   onPowerToggle,
   roadOffsetPx,
   roadDashPx,
+  fault,
+  charging,
 }) {
-  const status = { off: 'OFF', starting: 'STARTING…', ready: 'READY' }[power];
+  const status = fault ? 'FAULT' : { off: 'OFF', starting: 'STARTING…', ready: 'READY' }[power];
   return (
     <section className="card">
       <h2 className="card-title">Driver Display</h2>
@@ -39,7 +41,14 @@ export default function DriverDisplay({
           </div>
           <hr />
           <div className="stat">
-            <span className="stat-label">Battery</span>
+            <span className="stat-label">
+              Battery
+              {charging && (
+                <span className="charging-tag">
+                  <Icon name="bolt" size={13} /> Charging
+                </span>
+              )}
+            </span>
             <span className="stat-value battery-row">
               {fmt(socPercent)}%
               <span className="battery-icon">
@@ -63,7 +72,7 @@ export default function DriverDisplay({
         </div>
 
         <div className="cluster-center">
-          <span className={`power-status ${power}`}>{status}</span>
+          <span className={`power-status ${fault ? 'fault' : power}`}>{status}</span>
           <div className="speed">{fmt(speedKmh)}</div>
           <div className="speed-unit">{units.speed}</div>
           <div className="road">
@@ -72,11 +81,7 @@ export default function DriverDisplay({
           </div>
           <div className="gear-row" role="group" aria-label="Gear selector">
             {GEARS.map((g) => (
-              <button
-                key={g}
-                className={`gear-btn ${gear === g ? 'active' : ''}`}
-                onClick={() => onGearChange(g)}
-              >
+              <button key={g} className={`gear-btn ${gear === g ? 'active' : ''}`} onClick={() => onGearChange(g)}>
                 {g}
               </button>
             ))}

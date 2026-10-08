@@ -1,0 +1,30 @@
+{
+  "source": "Demo scenarios. Replace with live system states from the vehicle's CAN bus / telemetry feed when available.",
+  "systems": [
+    { "id": "motor", "label": "Motor", "blocksDriving": true },
+    { "id": "controller", "label": "Controller", "blocksDriving": true },
+    { "id": "canBus", "label": "CAN Bus", "blocksDriving": false },
+    { "id": "abs", "label": "ABS", "blocksDriving": false },
+    { "id": "esc", "label": "ESC", "blocksDriving": false }
+  ],
+  "statusLabels": { "ok": "Ready", "warning": "Warning", "error": "Fault" },
+  "headerLabels": { "ok": "SYSTEM ONLINE", "warning": "SYSTEM WARNING", "error": "SYSTEM FAULT" },
+  "defaultScenario": "normal",
+  "scenarios": [
+    {
+      "id": "normal",
+      "label": "Normal",
+      "states": { "motor": "ok", "controller": "ok", "canBus": "ok", "abs": "ok", "esc": "ok" }
+    },
+    {
+      "id": "warning",
+      "label": "Warning",
+      "states": { "motor": "ok", "controller": "warning", "canBus": "ok", "abs": "warning", "esc": "ok" }
+    },
+    {
+      "id": "fault",
+      "label": "Fault",
+      "states": { "motor": "error", "controller": "error", "canBus": "warning", "abs": "error", "esc": "warning" }
+    }
+  ]
+}

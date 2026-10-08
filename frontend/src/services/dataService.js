@@ -9,7 +9,8 @@ async function getJson(name) {
 }
 
 export async function loadAppData() {
-  const [ui, vehicles, vehicleState, driveModes, simulation, routes, scoring, energyModel] = await Promise.all([
+  const [ui, vehicles, vehicleState, driveModes, simulation, routes, scoring, energyModel, charging, vehicleSystems] =
+    await Promise.all([
     getJson('ui'),
     getJson('vehicles'),
     getJson('vehicle-state'),
@@ -18,6 +19,8 @@ export async function loadAppData() {
     getJson('routes'),
     getJson('scoring'),
     getJson('energy-model'),
+    getJson('charging'),
+    getJson('vehicle-systems'),
   ]);
-  return { ui, vehicles, vehicleState, driveModes, simulation, routes, scoring, energyModel };
+  return { ui, vehicles, vehicleState, driveModes, simulation, routes, scoring, energyModel, charging, vehicleSystems };
 }
