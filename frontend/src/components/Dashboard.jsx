@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Header from './Header';
 import DriverDisplay from './DriverDisplay';
 import DrivingControls from './DrivingControls';
@@ -6,7 +6,7 @@ import TouchScreen from './TouchScreen';
 import RouteEvaluation from './RouteEvaluation';
 import VehicleStatus from './VehicleStatus';
 import { useSimulation } from '../hooks/useSimulation';
-import { canShift, msToKmh } from '../lib/vehicleModel';
+import { canPowerOff, canShift, msToKmh } from '../lib/vehicleModel';
 import {
   baseEnergyRate,
   co2Kg,
@@ -17,6 +17,7 @@ import {
 
 const KEY_INPUTS = { ArrowUp: 'accel', ArrowDown: 'brake', ArrowLeft: 'left', ArrowRight: 'right' };
 const KEY_GEARS = { p: 'P', r: 'R', n: 'N', d: 'D' };
+const KEY_POWER = 's';
 
 function tabFromHash(tabs) {
   const id = window.location.hash.slice(1);
@@ -44,11 +45,14 @@ export default function Dashboard({ data }) {
   const [cabinTempC, setCabinTempC] = useState(vehicleState.cabinTempC);
   const [appliedRoute, setAppliedRoute] = useState(null);
   const [notice, setNotice] = useState(null);
+  // Vehicle power: 'off' -> 'starting' (for simulation.startupSeconds) -> 'ready'.
+  const [power, setPower] = useState(vehicleState.powerOn ? 'ready' : 'off');
+  const startTimer = useRef(null);
 
   const vehicleSpec = vehicles.find((v) => v.registrationNumber === registration) ?? vehicles[0];
   const vehicle = { ...simulation.vehicleDefaults, ...vehicleSpec };
   const mode = driveModes.find((m) => m.id === modeId) ?? driveModes[0];
-  const sim = useSimulation({ vehicle, mode, gear, config: simulation });
+  const sim = useSimulation({ vehicle, mode, gear, ready: power === 'ready', config: simulation });
   const { setInput, resetTrip } = sim;
 
   const speedKmh = msToKmh(sim.state.speedMs);
@@ -66,14 +70,28 @@ export default function Dashboard({ data }) {
 
   const requestGear = useCallback(
     (target) => {
-      if (canShift(target, speedKmh, simulation.gearChangeMaxKmh)) {
+      if (power !== 'ready' && target !== 'P') {
+        setNotice('Press START to switch the vehicle on');
+      } else if (canShift(target, speedKmh, simulation.gearChangeMaxKmh)) {
         setGear(target);
       } else {
         setNotice(`Slow down below ${simulation.gearChangeMaxKmh} ${ui.units.speed} to shift to ${target}`);
       }
     },
-    [speedKmh, simulation.gearChangeMaxKmh, ui.units.speed],
+    [power, speedKmh, simulation.gearChangeMaxKmh, ui.units.speed],
   );
+
+  const togglePower = useCallback(() => {
+    if (power === 'off') {
+      setPower('starting');
+      startTimer.current = setTimeout(() => setPower('ready'), simulation.startupSeconds * 1000);
+    } else if (power === 'ready') {
+      if (canPowerOff(gear)) setPower('off');
+      else setNotice('Stop and shift to P before switching off');
+    }
+  }, [power, gear, simulation.startupSeconds]);
+
+  useEffect(() => () => clearTimeout(startTimer.current), []);
 
   useEffect(() => {
     if (!notice) return undefined;
@@ -90,6 +108,8 @@ export default function Dashboard({ data }) {
         setInput(KEY_INPUTS[e.key], true);
       } else if (KEY_GEARS[e.key.toLowerCase()] && !e.repeat) {
         requestGear(KEY_GEARS[e.key.toLowerCase()]);
+      } else if (e.key.toLowerCase() === KEY_POWER && !e.repeat) {
+        togglePower();
       }
     };
     const up = (e) => {
@@ -104,7 +124,7 @@ export default function Dashboard({ data }) {
       window.removeEventListener('keyup', up);
       window.removeEventListener('blur', releaseAll);
     };
-  }, [setInput, requestGear]);
+  }, [setInput, requestGear, togglePower]);
 
   const applyRoute = (route) => {
     setAppliedRoute(route);
@@ -137,6 +157,10 @@ export default function Dashboard({ data }) {
             remainingKm={remainingKm}
             destinationName={appliedRoute?.destinationName}
             energyRate={energyRate}
+            power={power}
+            onPowerToggle={togglePower}
+            roadOffsetPx={sim.state.roadM * simulation.roadScrollPxPerM}
+            roadDashPx={simulation.roadDashPx}
           />
           <DrivingControls
             units={ui.units}

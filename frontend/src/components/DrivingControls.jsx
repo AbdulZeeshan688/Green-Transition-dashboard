@@ -97,7 +97,7 @@ export default function DrivingControls({ units, sim, speedKmh, gear, driveModes
         <Pedal label="Accelerator" kind="accel" value={state.accel} handlers={hold(setInput, 'accel')} />
       </div>
       <p className="hint">
-        Keyboard: ↑ accelerate · ↓ brake · ← → steer · P R N D gears. Mouse/touch: hold the pedals or a side of the wheel.
+        Press START (or S) first. Keyboard: ↑ accelerate · ↓ brake · ← → steer · P R N D gears. Mouse/touch: hold the pedals or a side of the wheel.
       </p>
     </section>
   );
