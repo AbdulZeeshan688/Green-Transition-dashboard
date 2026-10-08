@@ -16,11 +16,16 @@ export default function DriverDisplay({
   remainingKm,
   destinationName,
   energyRate,
+  power,
+  onPowerToggle,
+  roadOffsetPx,
+  roadDashPx,
 }) {
+  const status = { off: 'OFF', starting: 'STARTING…', ready: 'READY' }[power];
   return (
     <section className="card">
       <h2 className="card-title">Driver Display</h2>
-      <div className="cluster">
+      <div className={`cluster power-${power}`}>
         <div className="cluster-side">
           <div className="stat">
             <span className="stat-label">Route distance</span>
@@ -46,14 +51,24 @@ export default function DriverDisplay({
             </span>
             <span className="stat-label">Range</span>
           </div>
+          <button
+            className={`power-btn ${power}`}
+            onClick={onPowerToggle}
+            disabled={power === 'starting'}
+            aria-label={power === 'ready' ? 'Switch vehicle off' : 'Start vehicle'}
+          >
+            <Icon name="power" size={26} />
+            <span>{power === 'ready' ? 'STOP' : 'START'}</span>
+          </button>
         </div>
 
         <div className="cluster-center">
+          <span className={`power-status ${power}`}>{status}</span>
           <div className="speed">{fmt(speedKmh)}</div>
           <div className="speed-unit">{units.speed}</div>
           <div className="road">
-            <RoadView />
-            <CarRear />
+            <RoadView offsetPx={roadOffsetPx} dashPx={roadDashPx} />
+            <CarRear moving={speedKmh > 0.5} />
           </div>
           <div className="gear-row" role="group" aria-label="Gear selector">
             {GEARS.map((g) => (

@@ -37,13 +37,23 @@ export function canShift(targetGear, speedKmh, gearChangeMaxKmh) {
   return targetGear === 'N' || speedKmh <= gearChangeMaxKmh;
 }
 
-export const INITIAL_SIM_STATE = { speedMs: 0, steeringDeg: 0, accel: 0, brake: 0, tripKm: 0 };
+// Only P allows switching the vehicle off (P already holds the car at standstill).
+export function canPowerOff(gear) {
+  return gear === 'P';
+}
 
-export function stepSimulation(prev, inputs, { vehicle, mode, gear, sim }, dt) {
-  const accel = rampPedal(prev.accel, inputs.accel, dt, sim.pedalRampSeconds);
+export const INITIAL_SIM_STATE = { speedMs: 0, steeringDeg: 0, accel: 0, brake: 0, tripKm: 0, roadM: 0 };
+
+// `ready` = vehicle switched on. When off, the accelerator does nothing;
+// brake and steering still respond, as in a real car.
+export function stepSimulation(prev, inputs, { vehicle, mode, gear, sim, ready }, dt) {
+  const accel = rampPedal(prev.accel, ready && inputs.accel, dt, sim.pedalRampSeconds);
   const brake = rampPedal(prev.brake, inputs.brake, dt, sim.pedalRampSeconds);
   const speedMs = nextSpeed(prev.speedMs, { accel, brake }, gear, mode, vehicle, dt);
   const steeringDeg = nextSteering(prev.steeringDeg, inputs, dt, sim, vehicle.maxSteeringDeg);
-  const tripKm = prev.tripKm + ((prev.speedMs + speedMs) / 2) * dt / 1000;
-  return { speedMs, steeringDeg, accel, brake, tripKm };
+  const travelledM = ((prev.speedMs + speedMs) / 2) * dt;
+  const tripKm = prev.tripKm + travelledM / 1000;
+  // Signed distance for the road animation: negative while reversing.
+  const roadM = prev.roadM + (gear === 'R' ? -travelledM : travelledM);
+  return { speedMs, steeringDeg, accel, brake, tripKm, roadM };
 }

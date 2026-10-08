@@ -11,7 +11,7 @@ npm test         # logic + data-file validation tests
 npm run build    # production build into dist/
 ```
 
-Controls: **↑** accelerate · **↓** brake · **← →** steer · **P R N D** change gear.
+Controls: press **START** (or **S**) to switch the vehicle on. Then **↑** accelerate · **↓** brake · **← →** steer · **P R N D** change gear. STOP only works in P.
 With a mouse or touchscreen, hold a pedal or one side of the steering wheel.
 Each tab has its own link: `#dashboard`, `#route`, `#vehicle`.
 
@@ -54,6 +54,7 @@ On the dashboard:
 - **Energy use (kWh/km).** With a route applied, this is that route's average rate, including climbs and regen. Without one, it is the vehicle's base rate.
 - **Live battery** = starting SoC − trip energy ÷ capacity. **Range** = remaining battery energy ÷ base rate.
 - **Speed, steering, pedals, trip distance** come from the physics loop in `src/lib/vehicleModel.js`.
+- **Road animation:** the lane lines move by the distance actually driven (`roadScrollPxPerM` in `simulation.json`), so they stop when the car stops and run backwards in reverse.
 - **Route score (0–100)** comes from `src/lib/routeScoring.js`, weighted by `scoring.json`. It is a ranking aid; the Eco/Fastest labels use Sanjeev's rule.
 
 ## Not done yet

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canShift, kmhToMs, nextSpeed, nextSteering, rampPedal, stepSimulation } from './vehicleModel';
+import { canPowerOff, canShift, kmhToMs, nextSpeed, nextSteering, rampPedal, stepSimulation } from './vehicleModel';
 
 const vehicle = { maxSpeedKmh: 160, maxReverseKmh: 20, maxBrakeDecelMs2: 8, maxSteeringDeg: 540 };
 const mode = { maxAccelMs2: 2, coastDecelMs2: 0.5 };
@@ -56,5 +56,35 @@ describe('canShift', () => {
     expect(canShift('P', 50, 3)).toBe(false);
     expect(canShift('N', 50, 3)).toBe(true);
     expect(canShift('R', 2, 3)).toBe(true);
+  });
+});
+
+describe('power state', () => {
+  const idle = { speedMs: 0, steeringDeg: 0, accel: 0, brake: 0, tripKm: 0, roadM: 0 };
+  const pressAccel = { accel: true, brake: false, left: false, right: true };
+
+  it('ignores the accelerator while the vehicle is off, but still steers', () => {
+    const next = stepSimulation(idle, pressAccel, { vehicle, mode, gear: 'D', sim, ready: false }, 0.4);
+    expect(next.accel).toBe(0);
+    expect(next.speedMs).toBe(0);
+    expect(next.steeringDeg).toBeGreaterThan(0);
+  });
+
+  it('accelerates once the vehicle is ready', () => {
+    const next = stepSimulation(idle, pressAccel, { vehicle, mode, gear: 'D', sim, ready: true }, 0.4);
+    expect(next.accel).toBeCloseTo(0.5);
+    expect(next.speedMs).toBeGreaterThan(0);
+  });
+
+  it('road distance runs backwards in reverse', () => {
+    const moving = { ...idle, speedMs: 2 };
+    const ctx = { vehicle, mode: { ...mode, coastDecelMs2: 0 }, sim, ready: true };
+    expect(stepSimulation(moving, {}, { ...ctx, gear: 'D' }, 1).roadM).toBeCloseTo(2);
+    expect(stepSimulation(moving, {}, { ...ctx, gear: 'R' }, 1).roadM).toBeCloseTo(-2);
+  });
+
+  it('can only switch off in P', () => {
+    expect(canPowerOff('P')).toBe(true);
+    expect(canPowerOff('D')).toBe(false);
   });
 });

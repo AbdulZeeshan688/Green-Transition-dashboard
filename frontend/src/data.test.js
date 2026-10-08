@@ -59,8 +59,15 @@ describe('data files', () => {
     }
   });
 
+  it('power-on state is consistent', () => {
+    expect(typeof state.powerOn).toBe('boolean');
+    if (!state.powerOn) expect(state.gear).toBe('P');
+  });
+
   it('simulation timing values are positive', () => {
-    for (const key of ['tickMs', 'pedalRampSeconds', 'steeringRateDegPerSec', 'steeringReturnDegPerSec', 'climateStepC']) {
+    expect(sim.roadDashPx.length).toBe(2);
+    sim.roadDashPx.forEach((n) => expect(positive(n)).toBe(true));
+    for (const key of ['tickMs', 'pedalRampSeconds', 'steeringRateDegPerSec', 'steeringReturnDegPerSec', 'climateStepC', 'startupSeconds', 'roadScrollPxPerM']) {
       expect(positive(sim[key]), key).toBe(true);
     }
   });
