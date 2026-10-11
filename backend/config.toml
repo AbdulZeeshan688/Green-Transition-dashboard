@@ -1,0 +1,17 @@
+[route]
+default_start = [25.6612, 60.9827]
+default_end = [26.0380, 61.2050]
+alternatives = 3
+use_demo_data = false
+
+[vehicle]
+mass_kg = 1860
+consumption_kwh_100km = 15.5
+drive_efficiency = 0.85
+regen_efficiency = 0.65
+
+[grid]
+carbon_g_per_kwh = 50
+
+[physics]
+g = 9.81
