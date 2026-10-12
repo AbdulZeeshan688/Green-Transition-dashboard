@@ -5,7 +5,7 @@ import httpx
 
 from app.inputs.config import BACKEND_DIR
 
-ORS_URL = "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
+ORS_URL = "https://api.heigit.org/openrouteservice/v2/directions/driving-car/geojson"
 DEMO_FILE = BACKEND_DIR / "data" / "demo_routes.json"
 
 logger = logging.getLogger(__name__)
