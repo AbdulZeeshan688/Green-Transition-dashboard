@@ -6,9 +6,8 @@ class RouteRequest(BaseModel):
     end: list[float] | None = None
 
 
-class RouteResult(BaseModel):
+class RouteSummary(BaseModel):
     id: int
-    coords: list[list[float]]
     distance_m: float
     duration_s: float
     climb_m: float
@@ -20,10 +19,19 @@ class RouteResult(BaseModel):
     co2_kg: float
 
 
-class RoutesResponse(BaseModel):
+class RouteResult(RouteSummary):
+    coords: list[list[float]]
+
+
+class RoutesSummaryResponse(BaseModel):
     data_source: str
-    routes: list[RouteResult]
+    vehicle: str
     default_id: int
     best_id: int
     saved_kwh: float
     saved_co2_kg: float
+    routes: list[RouteSummary]
+
+
+class RoutesResponse(RoutesSummaryResponse):
+    routes: list[RouteResult]

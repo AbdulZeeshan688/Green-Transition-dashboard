@@ -14,4 +14,4 @@ def load_config() -> dict:
 
 def load_ors_api_key() -> str | None:
     load_dotenv(BACKEND_DIR / ".env")
-    return os.getenv("ORS_API_KEY") or None
+    return os.getenv("ORS_API_KEY")
