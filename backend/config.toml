@@ -11,13 +11,14 @@ Helsinki = [24.9384, 60.1699]
 Porvoo = [25.6651, 60.3932]
 
 [vehicle]
-mass_kg = 1860
-consumption_kwh_100km = 15.5
+name = "Polestar 2 Long Range Single Motor"
+mass_kg = 2070
+consumption_kwh_100km = 17.1
 drive_efficiency = 0.85
 regen_efficiency = 0.65
 
 [grid]
-carbon_g_per_kwh = 50
+carbon_g_per_kwh = 32
 
 [physics]
 g = 9.81
