@@ -1,25 +1,18 @@
-from app.calc import carbon, compare, elevation, energy
-from app.inputs import config as config_input
-from app.inputs import ors
+from app.calc import carbon, elevation, energy
+from app.calc.compare import compare_routes
+from app.inputs.config import load_config, load_ors_api_key
+from app.inputs.ors import get_routes
 
 
 def plan_routes(start: list[float] | None, end: list[float] | None) -> dict:
-    cfg = config_input.load_config()
+    cfg = load_config()
     start = start or cfg["route"]["default_start"]
     end = end or cfg["route"]["default_end"]
 
-    routes, data_source = ors.get_routes(start, end, cfg["route"], config_input.load_ors_api_key())
+    routes, data_source = get_routes(start, end, cfg["route"], load_ors_api_key())
     results = [calculate_route(route_id, route, cfg) for route_id, route in enumerate(routes)]
-    summary = compare.compare_routes(results)
 
-    return {
-        "data_source": data_source,
-        "routes": results,
-        "default_id": summary["default_id"],
-        "best_id": summary["best_id"],
-        "saved_kwh": round(summary["saved_kwh"], 3),
-        "saved_co2_kg": round(summary["saved_co2_kg"], 3),
-    }
+    return {"data_source": data_source, "vehicle": cfg["vehicle"]["name"], **compare_routes(results), "routes": results}
 
 
 def calculate_route(route_id: int, route: dict, cfg: dict) -> dict:
