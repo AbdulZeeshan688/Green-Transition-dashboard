@@ -15,7 +15,11 @@ def get_routes(start: list[float], end: list[float], route_config: dict, api_key
     if route_config["use_demo_data"] or not api_key:
         return parse_routes(load_demo()), "demo"
     try:
-        return parse_routes(request_ors(start, end, route_config["alternatives"], api_key)), "ors"
+        try:
+            raw = request_ors(start, end, route_config["alternatives"], api_key)
+        except httpx.HTTPStatusError:
+            raw = request_ors(start, end, 1, api_key)
+        return parse_routes(raw), "ors"
     except httpx.HTTPError as error:
         logger.warning("ORS request failed, using demo data: %s", error)
         return parse_routes(load_demo()), "demo"
