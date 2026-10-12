@@ -15,14 +15,17 @@ def get_routes(start: list[float], end: list[float], route_config: dict, api_key
     if route_config["use_demo_data"] or not api_key:
         return parse_routes(load_demo()), "demo"
     try:
-        try:
-            raw = request_ors(start, end, route_config["alternatives"], api_key)
-        except httpx.HTTPStatusError:
-            raw = request_ors(start, end, 1, api_key)
-        return parse_routes(raw), "ors"
+        return parse_routes(request_routes(start, end, route_config["alternatives"], api_key)), "ors"
     except httpx.HTTPError as error:
         logger.warning("ORS request failed, using demo data: %s", error)
         return parse_routes(load_demo()), "demo"
+
+
+def request_routes(start: list[float], end: list[float], alternatives: int, api_key: str) -> dict:
+    try:
+        return request_ors(start, end, alternatives, api_key)
+    except httpx.HTTPStatusError:
+        return request_ors(start, end, 1, api_key)
 
 
 def request_ors(start: list[float], end: list[float], alternatives: int, api_key: str) -> dict:
@@ -44,8 +47,8 @@ def parse_routes(raw: dict) -> list[dict]:
     for feature in raw["features"]:
         summary = feature["properties"]["summary"]
         routes.append({
-            "distance_m": summary.get("distance", 0.0),
-            "duration_s": summary.get("duration", 0.0),
+            "distance_m": summary["distance"],
+            "duration_s": summary["duration"],
             "coords": feature["geometry"]["coordinates"],
         })
     return routes
