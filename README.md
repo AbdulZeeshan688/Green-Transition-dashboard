@@ -55,12 +55,6 @@ git clone https://github.com/AbdulZeeshan688/Green-Transition-dashboard.git
 cd Green-Transition-dashboard
 ```
 
-> **Note:** until the pull request is merged into `main`, the dashboard is on the branch
-> `feature/polystar-dashboard`. Switch to it with:
-> ```bash
-> git checkout feature/polystar-dashboard
-> ```
-
 ### Step 3: Install and start
 
 ```bash
@@ -192,7 +186,7 @@ The full setup is in [`READMEfromOtherGroup.md`](READMEfromOtherGroup.md).
 | `Port 5173 is in use` | Another copy is running. Use the address the terminal prints (e.g. `:5174`), or close the other one. |
 | Blank page / "Could not load dashboard data" | Don't open `index.html` by double-clicking. Always start with `npm run dev` and open the address it shows. |
 | The car won't move | Press **START** first, then shift to **D**. Check that Safety is not set to **Fault**. |
-| `frontend` folder not found | Run `git checkout feature/polystar-dashboard` (see Step 2). |
+| `frontend` folder not found | Make sure you have the latest `main`: run `git checkout main` and then `git pull`. |
 
 ---
 
