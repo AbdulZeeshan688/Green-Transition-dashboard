@@ -9,6 +9,7 @@
     "energyConsumption": 17.1,
     "maxSpeedKmh": 160,
     "image": "images/polestar-2.png",
+    "imageSource": "Polestar (collaboration partner)",
     "specSource": "ev-database.org (MY21-22, WLTP)"
   },
   {
@@ -20,6 +21,8 @@
     "batteryCapacity": 75,
     "energyConsumption": 16.0,
     "maxSpeedKmh": 233,
+    "image": "images/tesla-model-3.png",
+    "imageSource": "Tesla manufacturer image, supplied by the team",
     "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
   },
   {
@@ -31,6 +34,8 @@
     "batteryCapacity": 58,
     "energyConsumption": 16.5,
     "maxSpeedKmh": 160,
+    "image": "images/vw-id3.png",
+    "imageSource": "Volkswagen manufacturer image, supplied by the team",
     "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
   },
   {
@@ -42,6 +47,8 @@
     "batteryCapacity": 77.4,
     "energyConsumption": 18.0,
     "maxSpeedKmh": 185,
+    "image": "images/hyundai-ioniq-5.png",
+    "imageSource": "Hyundai manufacturer image, supplied by the team",
     "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
   },
   {
@@ -53,6 +60,8 @@
     "batteryCapacity": 77.4,
     "energyConsumption": 17.5,
     "maxSpeedKmh": 185,
+    "image": "images/kia-ev6.png",
+    "imageSource": "Kia manufacturer image, supplied by the team",
     "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
   },
   {
@@ -64,6 +73,8 @@
     "batteryCapacity": 40,
     "energyConsumption": 17.1,
     "maxSpeedKmh": 144,
+    "image": "images/nissan-leaf.png",
+    "imageSource": "Nissan manufacturer image, supplied by the team",
     "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
   }
 ]

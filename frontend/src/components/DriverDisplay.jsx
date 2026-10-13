@@ -16,11 +16,18 @@ export default function DriverDisplay({
   remainingKm,
   destinationName,
   energyRate,
+  power,
+  onPowerToggle,
+  roadOffsetPx,
+  roadDashPx,
+  fault,
+  charging,
 }) {
+  const status = fault ? 'FAULT' : { off: 'OFF', starting: 'STARTING…', ready: 'READY' }[power];
   return (
     <section className="card">
       <h2 className="card-title">Driver Display</h2>
-      <div className="cluster">
+      <div className={`cluster power-${power}`}>
         <div className="cluster-side">
           <div className="stat">
             <span className="stat-label">Route distance</span>
@@ -34,7 +41,14 @@ export default function DriverDisplay({
           </div>
           <hr />
           <div className="stat">
-            <span className="stat-label">Battery</span>
+            <span className="stat-label">
+              Battery
+              {charging && (
+                <span className="charging-tag">
+                  <Icon name="bolt" size={13} /> Charging
+                </span>
+              )}
+            </span>
             <span className="stat-value battery-row">
               {fmt(socPercent)}%
               <span className="battery-icon">
@@ -46,22 +60,28 @@ export default function DriverDisplay({
             </span>
             <span className="stat-label">Range</span>
           </div>
+          <button
+            className={`power-btn ${power}`}
+            onClick={onPowerToggle}
+            disabled={power === 'starting'}
+            aria-label={power === 'ready' ? 'Switch vehicle off' : 'Start vehicle'}
+          >
+            <Icon name="power" size={26} />
+            <span>{power === 'ready' ? 'STOP' : 'START'}</span>
+          </button>
         </div>
 
         <div className="cluster-center">
+          <span className={`power-status ${fault ? 'fault' : power}`}>{status}</span>
           <div className="speed">{fmt(speedKmh)}</div>
           <div className="speed-unit">{units.speed}</div>
           <div className="road">
-            <RoadView />
-            <CarRear />
+            <RoadView offsetPx={roadOffsetPx} dashPx={roadDashPx} />
+            <CarRear moving={speedKmh > 0.5} />
           </div>
           <div className="gear-row" role="group" aria-label="Gear selector">
             {GEARS.map((g) => (
-              <button
-                key={g}
-                className={`gear-btn ${gear === g ? 'active' : ''}`}
-                onClick={() => onGearChange(g)}
-              >
+              <button key={g} className={`gear-btn ${gear === g ? 'active' : ''}`} onClick={() => onGearChange(g)}>
                 {g}
               </button>
             ))}

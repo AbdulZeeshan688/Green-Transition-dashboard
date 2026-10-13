@@ -11,7 +11,7 @@ npm test         # logic + data-file validation tests
 npm run build    # production build into dist/
 ```
 
-Controls: **↑** accelerate · **↓** brake · **← →** steer · **P R N D** change gear.
+Controls: press **START** (or **S**) to switch the vehicle on. Then **↑** accelerate · **↓** brake · **← →** steer · **P R N D** change gear. STOP only works in P.
 With a mouse or touchscreen, hold a pedal or one side of the steering wheel.
 Each tab has its own link: `#dashboard`, `#route`, `#vehicle`.
 
@@ -29,6 +29,8 @@ No values are hardcoded in components. Everything the UI shows is either loaded 
 | `energy-model.json` | Sanjeev's uphill/regen factors, grid CO₂ intensity (with sources) | Energy-model owner |
 | `routes.json` | Places and route candidates: distance, duration, uphill/downhill (**sample data**) | Routing team (OpenRouteService) |
 | `scoring.json` | Route-score metrics and weights | Anyone |
+| `charging.json` | Charger power, charge-limit range, demo speed-up | Anyone |
+| `vehicle-systems.json` | Vehicle systems (Motor, ABS…), which ones block driving, demo scenarios | Telemetry team (later live CAN data) |
 
 Why separate files:
 1. **Non-programmers can change the dashboard.** Adding a vehicle, place or tile, or retuning score weights, means editing JSON only.
@@ -54,7 +56,20 @@ On the dashboard:
 - **Energy use (kWh/km).** With a route applied, this is that route's average rate, including climbs and regen. Without one, it is the vehicle's base rate.
 - **Live battery** = starting SoC − trip energy ÷ capacity. **Range** = remaining battery energy ÷ base rate.
 - **Speed, steering, pedals, trip distance** come from the physics loop in `src/lib/vehicleModel.js`.
+- **Road animation:** the lane lines move by the distance actually driven (`roadScrollPxPerM` in `simulation.json`), so they stop when the car stops and run backwards in reverse.
 - **Route score (0–100)** comes from `src/lib/routeScoring.js`, weighted by `scoring.json`. It is a ranking aid; the Eco/Fastest labels use Sanjeev's rule.
+
+## Touchscreen panels
+
+| Tile / menu | What it does |
+|---|---|
+| **Charging** | Set a charge limit and charge. SoC rises by `power × time / capacity`. Shows energy and **real** time to the limit; the on-screen demo runs `demoTimeScale`× faster. The vehicle must be off to charge. |
+| **Safety** | Live status of Motor, Controller, CAN bus, ABS and ESC. A fault in a system marked `blocksDriving` disables driving (display shows FAULT), and the header pill switches to WARNING/FAULT. |
+| **Comfort** / Drive | Drive mode (acceleration and regen per `drive-modes.json`) and a regenerative-braking switch. With regen off, Sanjeev's downhill-recovery term is set to 0. |
+| **Settings** | Choose the vehicle (re-calculates range, energy and routes) and reset the trip. |
+| Vehicle, Route Evaluation | Open the matching tab. |
+
+Interior, Exterior, Climate (side menu) and the bottom-bar icons are part of the visual design only, so they are not clickable. The cabin temperature − / + does work.
 
 ## Not done yet
 

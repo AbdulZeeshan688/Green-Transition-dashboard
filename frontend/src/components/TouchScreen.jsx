@@ -12,9 +12,25 @@ function useClock() {
   return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export default function TouchScreen({ ui, vehicle, rangeKm, cabinTempC, onTempChange, climate, onOpenTab }) {
+// `panel` is the open touchscreen view ('home' or one of TOUCHSCREEN_PANELS);
+// `children` is that panel's content. Items without a link in ui.json stay
+// visible but are not clickable.
+export default function TouchScreen({
+  ui,
+  vehicle,
+  rangeKm,
+  cabinTempC,
+  onTempChange,
+  climate,
+  onOpenTab,
+  panel,
+  onOpenPanel,
+  children,
+}) {
   const time = useClock();
   const { sideNav, tiles } = ui.touchscreen;
+  const open = (item) => (item.opensPanel ? onOpenPanel(item.opensPanel) : onOpenTab(item.opensTab));
+  const isLink = (item) => Boolean(item.opensPanel || item.opensTab);
 
   return (
     <section className="screen-wrap">
@@ -34,12 +50,12 @@ export default function TouchScreen({ ui, vehicle, rangeKm, cabinTempC, onTempCh
 
           <div className="screen-body">
             <nav className="side-nav" aria-label="Touchscreen">
-              {sideNav.map((item, i) => (
+              {sideNav.map((item) => (
                 <button
                   key={item.id}
-                  className={`side-item ${i === 0 ? 'active' : ''}`}
-                  onClick={item.opensTab ? () => onOpenTab(item.opensTab) : undefined}
-                  disabled={i !== 0 && !item.opensTab}
+                  className={`side-item ${item.opensPanel === panel ? 'active' : ''}`}
+                  onClick={isLink(item) ? () => open(item) : undefined}
+                  disabled={!isLink(item)}
                 >
                   <Icon name={item.icon} size={26} />
                   {item.label}
@@ -48,43 +64,49 @@ export default function TouchScreen({ ui, vehicle, rangeKm, cabinTempC, onTempCh
             </nav>
 
             <div className="screen-content">
-              <div className="vehicle-card">
-                <div>
-                  <h3>
-                    {vehicle.make} {vehicle.model}
-                  </h3>
-                  <p className="muted">{vehicle.variant}</p>
-                  <p className="range-value">
-                    {fmt(rangeKm)} {ui.units.distance}
-                  </p>
-                  <p className="muted">Range</p>
-                </div>
-                <CarImage vehicle={vehicle} />
-              </div>
-
-              <div className="tile-grid">
-                {tiles.map((tile) => {
-                  const content = (
-                    <>
-                      <Icon name={tile.icon} size={28} />
-                      <span>
-                        <strong>{tile.title}</strong>
-                        <small>{tile.subtitle}</small>
-                      </span>
-                    </>
-                  );
-                  const cls = `tile ${tile.wide ? 'wide' : ''}`;
-                  return tile.opensTab ? (
-                    <button key={tile.id} className={`${cls} link`} onClick={() => onOpenTab(tile.opensTab)}>
-                      {content}
-                    </button>
-                  ) : (
-                    <div key={tile.id} className={cls}>
-                      {content}
+              {panel !== 'home' ? (
+                children
+              ) : (
+                <>
+                  <div className="vehicle-card">
+                    <div>
+                      <h3>
+                        {vehicle.make} {vehicle.model}
+                      </h3>
+                      <p className="muted">{vehicle.variant}</p>
+                      <p className="range-value">
+                        {fmt(rangeKm)} {ui.units.distance}
+                      </p>
+                      <p className="muted">Range</p>
                     </div>
-                  );
-                })}
-              </div>
+                    <CarImage vehicle={vehicle} />
+                  </div>
+
+                  <div className="tile-grid">
+                    {tiles.map((tile) => {
+                      const content = (
+                        <>
+                          <Icon name={tile.icon} size={28} />
+                          <span>
+                            <strong>{tile.title}</strong>
+                            <small>{tile.subtitle}</small>
+                          </span>
+                        </>
+                      );
+                      const cls = `tile ${tile.wide ? 'wide' : ''}`;
+                      return isLink(tile) ? (
+                        <button key={tile.id} className={`${cls} link`} onClick={() => open(tile)}>
+                          {content}
+                        </button>
+                      ) : (
+                        <div key={tile.id} className={cls}>
+                          {content}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

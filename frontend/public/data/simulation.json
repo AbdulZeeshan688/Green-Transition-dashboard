@@ -4,6 +4,12 @@
   "steeringRateDegPerSec": 360,
   "steeringReturnDegPerSec": 540,
   "gearChangeMaxKmh": 3,
+  "startupSeconds": 1.5,
+  "roadDashPx": [
+    22,
+    18
+  ],
+  "roadScrollPxPerM": 4,
   "climateMinC": 16,
   "climateMaxC": 28,
   "climateStepC": 0.5,
