@@ -75,6 +75,40 @@ To stop the app, press **Ctrl + C** in the terminal.
 
 ---
 
+## Running the backend (optional)
+
+The `backend/` folder is a **Python (FastAPI)** service. It finds real routes between Finnish cities with **OpenRouteService** and calculates energy and CO₂ for each route. The dashboard doesn't use it yet (see *Status*), so you only need it to try the API.
+
+**Extra tool needed:** **Python 3.12 or newer**, from <https://www.python.org>.
+
+From the project folder:
+
+**macOS / Linux**
+```bash
+cd backend
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+```
+
+**Windows (PowerShell)**
+```powershell
+cd backend
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt
+.venv\Scripts\python -m uvicorn app.main:app --reload --port 8000
+```
+
+Open **<http://localhost:8000/docs>** to try the API, for example `GET /api/routes/by-city` with `Lahti` → `Heinola`.
+
+- **No API key?** It still works: it uses the demo routes in `backend/data/demo_routes.json`.
+- **Real routes:** copy `backend/.env.example` to `backend/.env` and add your free OpenRouteService key (`ORS_API_KEY=...`) from <https://openrouteservice.org>.
+- **Tests:** `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`).
+
+More details are in [`backend/README.md`](backend/README.md).
+
+---
+
 ## How to use it
 
 | Action | Keyboard | Mouse / touch |
@@ -153,12 +187,13 @@ Green-Transition-dashboard/
 │   ├── public/data/   ← All data files (JSON)
 │   ├── public/images/ ← Vehicle photos
 │   └── src/           ← React code: components, formulas, tests
+├── backend/           ← Python API: real routes (OpenRouteService), energy and CO₂
 ├── docs/screenshots/  ← Pictures used in this README
 ├── Documents/         ← Reports, project plan and timesheets
 └── src/, index.html, package.json …  ← Earlier prototype by Unubold Luvsandagva (see below)
 ```
 
-**Built with:** JavaScript, React 18, Vite, Vitest, HTML and CSS.
+**Built with:** JavaScript, React 18, Vite, Vitest, HTML and CSS (frontend) · Python, FastAPI, pytest (backend).
 
 ---
 
@@ -195,8 +230,10 @@ The full setup is in [`READMEfromOtherGroup.md`](READMEfromOtherGroup.md).
 - [x] Driver display, driving simulation and push-start
 - [x] Energy, battery, range and CO₂ with the team energy model
 - [x] Route evaluation (Eco / Fastest), charging, safety and vehicle selection
-- [x] 45 automatic tests
-- [ ] Backend: real routes from OpenRouteService and live CO₂ data from Fingrid
+- [x] 45 automatic frontend tests
+- [x] Backend API: real routes from OpenRouteService with energy and CO₂ per route (9 tests)
+- [ ] Connect the dashboard to the backend (replace the sample routes)
+- [ ] Live electricity CO₂ data from Fingrid
 - [ ] Real map (Leaflet / OpenStreetMap)
 
-Routes, the starting battery level and the safety scenarios are **sample data** for now. They will come from the backend.
+Until the dashboard is connected to the backend, its routes, starting battery level and safety scenarios are **sample data**.
