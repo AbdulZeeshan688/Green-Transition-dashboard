@@ -1,7 +1,7 @@
 import Icon from './Icon';
 import { StarLogo } from './Graphics';
 
-export default function Header({ ui, activeTab, onTabChange, systemOnline }) {
+export default function Header({ ui, activeTab, onTabChange, systemOnline, systemLevel, systemLabel }) {
   return (
     <header className="header">
       <div className="brand">
@@ -21,9 +21,9 @@ export default function Header({ ui, activeTab, onTabChange, systemOnline }) {
           </button>
         ))}
       </nav>
-      <div className={`status-pill ${systemOnline ? 'online' : 'offline'}`}>
+      <div className={`status-pill ${systemOnline ? systemLevel : 'offline'}`}>
         <span className="dot" />
-        {systemOnline ? 'SYSTEM ONLINE' : 'SYSTEM OFFLINE'}
+        {systemOnline ? systemLabel : 'SYSTEM OFFLINE'}
       </div>
     </header>
   );

@@ -2,6 +2,8 @@
 // by `npm test` instead of breaking the dashboard at runtime.
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { TOUCHSCREEN_PANELS } from './lib/panels';
+import { STATUS_LEVELS } from './lib/vehicleSystems';
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../public/data/${name}.json`, import.meta.url), 'utf8'));
 
@@ -13,6 +15,8 @@ const sim = load('simulation');
 const { places, routes } = load('routes');
 const scoring = load('scoring');
 const energyModel = load('energy-model');
+const charging = load('charging');
+const systemsCfg = load('vehicle-systems');
 
 const unique = (list) => new Set(list).size === list.length;
 const positive = (n) => typeof n === 'number' && n > 0;
@@ -59,8 +63,15 @@ describe('data files', () => {
     }
   });
 
+  it('power-on state is consistent', () => {
+    expect(typeof state.powerOn).toBe('boolean');
+    if (!state.powerOn) expect(state.gear).toBe('P');
+  });
+
   it('simulation timing values are positive', () => {
-    for (const key of ['tickMs', 'pedalRampSeconds', 'steeringRateDegPerSec', 'steeringReturnDegPerSec', 'climateStepC']) {
+    expect(sim.roadDashPx.length).toBe(2);
+    sim.roadDashPx.forEach((n) => expect(positive(n)).toBe(true));
+    for (const key of ['tickMs', 'pedalRampSeconds', 'steeringRateDegPerSec', 'steeringReturnDegPerSec', 'climateStepC', 'startupSeconds', 'roadScrollPxPerM']) {
       expect(positive(sim[key]), key).toBe(true);
     }
   });
@@ -88,9 +99,36 @@ describe('data files', () => {
     }
   });
 
-  it('every tab/tile link points at an existing tab', () => {
+  it('every tab/tile link points at an existing tab or touchscreen panel', () => {
     const tabIds = new Set(ui.tabs.map((t) => t.id));
-    const links = [...ui.touchscreen.tiles, ...ui.touchscreen.sideNav].filter((x) => x.opensTab);
-    for (const l of links) expect(tabIds.has(l.opensTab), l.id).toBe(true);
+    const items = [...ui.touchscreen.tiles, ...ui.touchscreen.sideNav];
+    for (const l of items.filter((x) => x.opensTab)) expect(tabIds.has(l.opensTab), l.id).toBe(true);
+    for (const l of items.filter((x) => x.opensPanel)) expect(TOUCHSCREEN_PANELS, l.id).toContain(l.opensPanel);
+  });
+
+  it('charging settings are consistent', () => {
+    for (const key of ['chargerPowerKW', 'limitStepPercent', 'demoTimeScale']) {
+      expect(positive(charging[key]), key).toBe(true);
+    }
+    expect(charging.limitMinPercent).toBeLessThan(charging.limitMaxPercent);
+    expect(charging.limitMaxPercent).toBeLessThanOrEqual(100);
+    expect(charging.defaultLimitPercent).toBeGreaterThanOrEqual(charging.limitMinPercent);
+    expect(charging.defaultLimitPercent).toBeLessThanOrEqual(charging.limitMaxPercent);
+  });
+
+  it('vehicle-system scenarios use known systems and valid states', () => {
+    const ids = new Set(systemsCfg.systems.map((x) => x.id));
+    expect(unique(systemsCfg.systems.map((x) => x.id))).toBe(true);
+    expect(systemsCfg.scenarios.some((x) => x.id === systemsCfg.defaultScenario)).toBe(true);
+    for (const level of STATUS_LEVELS) {
+      expect(typeof systemsCfg.statusLabels[level], level).toBe('string');
+      expect(typeof systemsCfg.headerLabels[level], level).toBe('string');
+    }
+    for (const sc of systemsCfg.scenarios) {
+      for (const [sys, st] of Object.entries(sc.states)) {
+        expect(ids.has(sys), `${sc.id}.${sys}`).toBe(true);
+        expect(STATUS_LEVELS, `${sc.id}.${sys}`).toContain(st);
+      }
+    }
   });
 });

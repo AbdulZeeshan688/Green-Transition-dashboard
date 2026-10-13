@@ -38,7 +38,9 @@ export function SteeringWheel({ angleDeg }) {
   );
 }
 
-export function RoadView() {
+// offsetPx moves the lane dashes; it comes from distance actually driven,
+// so the road scrolls exactly as fast as the car is going.
+export function RoadView({ offsetPx = 0, dashPx }) {
   return (
     <svg viewBox="0 0 400 260" className="road-svg" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
       <defs>
@@ -52,15 +54,22 @@ export function RoadView() {
         </linearGradient>
       </defs>
       <path d="M200 0 L20 260 M200 0 L380 260" stroke="url(#fade)" strokeWidth="2" fill="none" />
-      <path d="M200 0 L120 260 M200 0 L280 260" stroke="url(#fade)" strokeWidth="5" strokeDasharray="22 18" fill="none" />
-      <path d="M194 6 L206 6 L232 200 L168 200 Z" fill="url(#beam)" />
+      <path
+        d="M200 0 L120 260 M200 0 L280 260"
+        stroke="url(#fade)"
+        strokeWidth="5"
+        strokeDasharray={dashPx.join(' ')}
+        strokeDashoffset={-offsetPx}
+        fill="none"
+      />
+      <path className="road-beam" d="M194 6 L206 6 L232 200 L168 200 Z" fill="url(#beam)" />
     </svg>
   );
 }
 
-export function CarRear() {
+export function CarRear({ moving = false }) {
   return (
-    <svg viewBox="0 0 120 90" className="car-rear-svg" aria-hidden="true">
+    <svg viewBox="0 0 120 90" className={`car-rear-svg ${moving ? 'moving' : ''}`} aria-hidden="true">
       <ellipse cx="60" cy="84" rx="54" ry="5" fill="#000" opacity="0.5" />
       <rect x="10" y="62" width="16" height="20" rx="4" fill="#15181a" />
       <rect x="94" y="62" width="16" height="20" rx="4" fill="#15181a" />

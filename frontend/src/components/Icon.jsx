@@ -87,6 +87,12 @@ const PATHS = {
       <path d="M8 18h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7" />
     </>
   ),
+  power: (
+    <>
+      <path d="M12 3v8" />
+      <path d="M6.3 6.8a8 8 0 1 0 11.4 0" />
+    </>
+  ),
   swap: <path d="M4 8h15l-3.5-3.5M20 16H5l3.5 3.5" />,
   close: <path d="M6 6l12 12M18 6L6 18" />,
   clock: (

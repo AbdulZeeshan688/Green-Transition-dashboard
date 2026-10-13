@@ -1,0 +1,10 @@
+{
+  "chargerLabel": "AC wallbox",
+  "chargerPowerKW": 11,
+  "limitMinPercent": 50,
+  "limitMaxPercent": 100,
+  "limitStepPercent": 5,
+  "defaultLimitPercent": 90,
+  "demoTimeScale": 120,
+  "note": "demoTimeScale only speeds up the on-screen demo; 'time to limit' is shown in real time (energy needed / charger power)."
+}

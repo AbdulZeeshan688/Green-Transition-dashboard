@@ -3,11 +3,11 @@ import { INITIAL_SIM_STATE, stepSimulation } from '../lib/vehicleModel';
 
 // Runs the driving loop. Inputs (pedals/steering held) live in a ref so that
 // keyboard and pointer events don't cause extra renders.
-export function useSimulation({ vehicle, mode, gear, config }) {
+export function useSimulation({ vehicle, mode, gear, ready, config }) {
   const [state, setState] = useState(INITIAL_SIM_STATE);
   const inputs = useRef({ accel: false, brake: false, left: false, right: false });
   const context = useRef(null);
-  context.current = { vehicle, mode, gear, sim: config };
+  context.current = { vehicle, mode, gear, ready, sim: config };
 
   useEffect(() => {
     let last = performance.now();
