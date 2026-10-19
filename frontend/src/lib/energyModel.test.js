@@ -56,7 +56,11 @@ describe('Sanjeev energy model', () => {
   });
 
   it('evaluateRoute adds all metrics', () => {
-    const r = evaluateRoute({ id: 'x', distanceKm: 50, durationMin: 30, totalUphill: 0, totalDownhill: 0 }, vehicle, model);
+    const r = evaluateRoute(
+      { id: 'x', distanceKm: 50, durationMin: 30, totalUphill: 0, totalDownhill: 0 },
+      vehicle,
+      model,
+    );
     expect(r.energyKWh).toBeCloseTo(8);
     expect(r.batteryUsagePercent).toBeCloseTo(10.667, 2);
     expect(r.co2Kg).toBeCloseTo(0.256);

@@ -28,12 +28,24 @@ export function SteeringWheel({ angleDeg }) {
         </linearGradient>
       </defs>
       <circle cx="100" cy="100" r="86" fill="none" stroke="url(#rimGrad)" strokeWidth="20" />
-      <path d="M22 104 Q60 92 74 110 L86 150 Q100 158 114 150 L126 110 Q140 92 178 104" fill="none" stroke="url(#spokeGrad)" strokeWidth="9" strokeLinecap="round" />
-      <path d="M30 100 Q62 88 76 104 L88 146 Q100 152 112 146 L124 104 Q138 88 170 100 L168 116 Q140 106 130 122 L118 160 Q100 172 82 160 L70 122 Q60 106 32 116 Z" fill="#1d2124" />
+      <path
+        d="M22 104 Q60 92 74 110 L86 150 Q100 158 114 150 L126 110 Q140 92 178 104"
+        fill="none"
+        stroke="url(#spokeGrad)"
+        strokeWidth="9"
+        strokeLinecap="round"
+      />
+      <path
+        d="M30 100 Q62 88 76 104 L88 146 Q100 152 112 146 L124 104 Q138 88 170 100 L168 116 Q140 106 130 122 L118 160 Q100 172 82 160 L70 122 Q60 106 32 116 Z"
+        fill="#1d2124"
+      />
       <circle cx="100" cy="104" r="30" fill="#24292d" stroke="#3a4045" strokeWidth="2" />
       <rect x="44" y="102" width="18" height="12" rx="4" fill="#2f3539" />
       <rect x="138" y="102" width="18" height="12" rx="4" fill="#2f3539" />
-      <path d="M100 86 L103.5 100.5 L118 104 L103.5 107.5 L100 122 L96.5 107.5 L82 104 L96.5 100.5 Z" fill="var(--green-light)" />
+      <path
+        d="M100 86 L103.5 100.5 L118 104 L103.5 107.5 L100 122 L96.5 107.5 L82 104 L96.5 100.5 Z"
+        fill="var(--green-light)"
+      />
     </svg>
   );
 }
@@ -62,6 +74,14 @@ export function RoadView({ offsetPx = 0, dashPx }) {
         strokeDashoffset={-offsetPx}
         fill="none"
       />
+      <defs>
+        <linearGradient id="headlightGlow" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#fffbe6" stopOpacity="0.32" />
+          <stop offset="100%" stopColor="#fffbe6" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path className="headlight-cone low" d="M150 215 L250 215 L228 110 L172 110 Z" fill="url(#headlightGlow)" />
+      <path className="headlight-cone high" d="M140 215 L260 215 L215 20 L185 20 Z" fill="url(#headlightGlow)" />
       <path className="road-beam" d="M194 6 L206 6 L232 200 L168 200 Z" fill="url(#beam)" />
     </svg>
   );

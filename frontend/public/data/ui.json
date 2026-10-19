@@ -35,7 +35,8 @@
       {
         "id": "climate",
         "label": "Climate",
-        "icon": "fan"
+        "icon": "fan",
+        "opensPanel": "climate"
       },
       {
         "id": "settings",
@@ -55,14 +56,16 @@
       {
         "id": "interior",
         "title": "Interior",
-        "subtitle": "Cabin and seating",
-        "icon": "seat"
+        "subtitle": "Lighting, doors and child lock",
+        "icon": "seat",
+        "opensPanel": "interior"
       },
       {
         "id": "exterior",
         "title": "Exterior",
-        "subtitle": "Lights and mirrors",
-        "icon": "sun"
+        "subtitle": "Lights, mirrors and openings",
+        "icon": "sun",
+        "opensPanel": "exterior"
       },
       {
         "id": "comfort",
