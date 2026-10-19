@@ -22,12 +22,24 @@ export default function DriverDisplay({
   roadDashPx,
   fault,
   charging,
+  cabin,
+  ambient,
+  blinkMs,
+  openPartLabels,
 }) {
   const status = fault ? 'FAULT' : { off: 'OFF', starting: 'STARTING…', ready: 'READY' }[power];
+  const { signals, lights } = cabin;
+  const leftOn = signals.left || signals.hazard;
+  const rightOn = signals.right || signals.hazard;
+  const beam = lights.headlights === 'high' ? 'high' : lights.headlights === 'off' ? 'off' : 'low';
+  const clusterStyle = {
+    '--blink-ms': `${blinkMs}ms`,
+    ...(ambient && { '--ambient': ambient.hex, '--ambient-alpha': ambient.brightness / 100 }),
+  };
   return (
     <section className="card">
       <h2 className="card-title">Driver Display</h2>
-      <div className={`cluster power-${power}`}>
+      <div className={`cluster power-${power} ${ambient ? 'ambient-on' : ''}`} style={clusterStyle}>
         <div className="cluster-side">
           <div className="stat">
             <span className="stat-label">Route distance</span>
@@ -72,10 +84,34 @@ export default function DriverDisplay({
         </div>
 
         <div className="cluster-center">
+          <div className="telltales" aria-label="Indicator lights">
+            <span className={`telltale signal ${leftOn ? 'blink' : ''}`} title="Left turn signal">
+              <Icon name="arrowLeftFill" size={22} />
+            </span>
+            <span className={`telltale beam-${lights.headlights}`} title={`Headlights: ${lights.headlights}`}>
+              <Icon name="headlight" size={20} />
+              {lights.headlights === 'auto' && <small>A</small>}
+            </span>
+            <span className={`telltale fog ${lights.fogLights ? 'on' : ''}`} title="Fog lights">
+              <Icon name="fog" size={20} />
+            </span>
+            <span
+              className={`telltale warn ${openPartLabels.length ? 'on' : ''}`}
+              title={openPartLabels.length ? `Open: ${openPartLabels.join(', ')}` : 'All closed'}
+            >
+              <Icon name="doorOpen" size={20} />
+            </span>
+            <span className={`telltale hazard ${signals.hazard ? 'blink' : ''}`} title="Hazard lights">
+              <Icon name="hazard" size={20} />
+            </span>
+            <span className={`telltale signal ${rightOn ? 'blink' : ''}`} title="Right turn signal">
+              <Icon name="arrowRightFill" size={22} />
+            </span>
+          </div>
           <span className={`power-status ${fault ? 'fault' : power}`}>{status}</span>
           <div className="speed">{fmt(speedKmh)}</div>
           <div className="speed-unit">{units.speed}</div>
-          <div className="road">
+          <div className={`road beam-${beam}`}>
             <RoadView offsetPx={roadOffsetPx} dashPx={roadDashPx} />
             <CarRear moving={speedKmh > 0.5} />
           </div>

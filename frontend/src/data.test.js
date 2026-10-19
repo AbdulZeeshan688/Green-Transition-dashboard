@@ -17,6 +17,8 @@ const scoring = load('scoring');
 const energyModel = load('energy-model');
 const charging = load('charging');
 const systemsCfg = load('vehicle-systems');
+const integrations = load('integrations');
+const cabinCfg = load('cabin');
 
 const unique = (list) => new Set(list).size === list.length;
 const positive = (n) => typeof n === 'number' && n > 0;
@@ -114,6 +116,40 @@ describe('data files', () => {
     expect(charging.limitMaxPercent).toBeLessThanOrEqual(100);
     expect(charging.defaultLimitPercent).toBeGreaterThanOrEqual(charging.limitMinPercent);
     expect(charging.defaultLimitPercent).toBeLessThanOrEqual(charging.limitMaxPercent);
+  });
+
+  it('integrations: default sources exist and backend places have coordinates', () => {
+    for (const group of [integrations.driverInput, integrations.routes]) {
+      expect(unique(group.sources.map((x) => x.id))).toBe(true);
+      expect(group.sources.some((x) => x.id === group.defaultSource), group.defaultSource).toBe(true);
+    }
+    const wheel = integrations.driverInput.wheel;
+    expect(wheel.url).toMatch(/^wss?:\/\//);
+    for (const key of ['reconnectSeconds', 'staleMs', 'stateIntervalMs']) expect(positive(wheel[key]), key).toBe(true);
+    const backend = integrations.routes.backend;
+    expect(backend.path.startsWith('/')).toBe(true);
+    expect(backend.places.length).toBeGreaterThanOrEqual(2);
+    for (const p of backend.places) {
+      expect(p.coords, p.id).toHaveLength(2);
+      const [lon, lat] = p.coords;
+      expect(lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90, p.id).toBe(true);
+    }
+  });
+
+  it('cabin settings are consistent', () => {
+    const { climate, lights, body, audio, phone } = cabinCfg;
+    expect(positive(climate.fanLevels) && positive(climate.seatHeatLevels)).toBe(true);
+    expect(climate.defaults.fanLevel).toBeLessThanOrEqual(climate.fanLevels);
+    expect(climate.defaults.passengerTempC).toBeGreaterThanOrEqual(sim.climateMinC);
+    expect(climate.defaults.passengerTempC).toBeLessThanOrEqual(sim.climateMaxC);
+    expect(lights.headlightModes.map((m) => m.id)).toContain(lights.defaults.headlights);
+    expect(lights.ambientColors.map((c) => c.id)).toContain(lights.defaults.ambientColor);
+    lights.ambientColors.forEach((c) => expect(c.hex, c.id).toMatch(/^#[0-9a-f]{6}$/i));
+    const partIds = body.parts.map((p) => p.id);
+    body.openOnlyWhenParked.forEach((id) => expect(partIds).toContain(id));
+    expect(Object.keys(body.defaults.open).sort()).toEqual([...partIds].sort());
+    expect(audio.defaults.volume).toBeLessThanOrEqual(audio.volumeMax);
+    expect(positive(phone.pairingSeconds)).toBe(true);
   });
 
   it('vehicle-system scenarios use known systems and valid states', () => {

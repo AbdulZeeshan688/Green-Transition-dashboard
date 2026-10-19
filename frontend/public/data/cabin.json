@@ -1,0 +1,67 @@
+{
+  "description": "Cabin and body features (climate, lights, doors, audio, phone): limits and starting values. Driver temperature starts from vehicle-state.json cabinTempC; limits come from simulation.json.",
+  "climate": {
+    "fanLevels": 7,
+    "seatHeatLevels": 3,
+    "defaults": {
+      "passengerTempC": 22,
+      "syncTemps": true,
+      "fanLevel": 3,
+      "fanAuto": true,
+      "ac": true,
+      "recirculation": false,
+      "frontDefrost": false,
+      "rearDefrost": false,
+      "seatHeat": { "driver": 0, "passenger": 0 },
+      "steeringHeat": false
+    }
+  },
+  "lights": {
+    "headlightModes": [
+      { "id": "off", "label": "Off" },
+      { "id": "auto", "label": "Auto" },
+      { "id": "low", "label": "Low beam" },
+      { "id": "high", "label": "High beam" }
+    ],
+    "ambientColors": [
+      { "id": "warm", "label": "Warm white", "hex": "#f3d9a4" },
+      { "id": "green", "label": "Polestar green", "hex": "#6cc04a" },
+      { "id": "blue", "label": "Arctic blue", "hex": "#5aa9e6" },
+      { "id": "amber", "label": "Amber", "hex": "#f0a020" }
+    ],
+    "signalBlinkMs": 700,
+    "defaults": {
+      "headlights": "auto",
+      "fogLights": false,
+      "ambientOn": true,
+      "ambientColor": "warm",
+      "ambientBrightness": 60,
+      "readingLights": false
+    }
+  },
+  "body": {
+    "autoLockKmh": 10,
+    "openOnlyWhenParked": ["trunk", "frunk", "chargePort"],
+    "parts": [
+      { "id": "trunk", "label": "Trunk" },
+      { "id": "frunk", "label": "Front trunk" },
+      { "id": "chargePort", "label": "Charge port" }
+    ],
+    "defaults": {
+      "locked": true,
+      "childLock": false,
+      "mirrorsFolded": false,
+      "open": { "trunk": false, "frunk": false, "chargePort": false }
+    }
+  },
+  "audio": {
+    "volumeMax": 30,
+    "defaults": { "volume": 12, "muted": false }
+  },
+  "phone": {
+    "note": "Demo only: no real phone is connected. Pairing lists the demo devices below.",
+    "demoDevices": [{ "id": "demo-phone", "name": "Demo phone" }],
+    "pairingSeconds": 2,
+    "defaults": { "bluetooth": true, "pairedDeviceId": null }
+  }
+}

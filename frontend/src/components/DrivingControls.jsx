@@ -33,7 +33,18 @@ function Pedal({ label, value, kind, handlers }) {
   );
 }
 
-export default function DrivingControls({ units, sim, speedKmh, gear, driveModes, modeId, onModeChange }) {
+export default function DrivingControls({
+  units,
+  sim,
+  speedKmh,
+  gear,
+  driveModes,
+  modeId,
+  onModeChange,
+  inputSource,
+  inputLabel,
+  wheelStatus,
+}) {
   const { state, setInput } = sim;
 
   const steerHandlers = {
@@ -54,7 +65,15 @@ export default function DrivingControls({ units, sim, speedKmh, gear, driveModes
 
   return (
     <section className="card">
-      <h2 className="card-title">Driving Controls</h2>
+      <div className="card-title-row">
+        <h2 className="card-title">Driving Controls</h2>
+        <span className={`input-pill ${inputSource === 'local' ? 'local' : wheelStatus}`} title="Change in Settings">
+          <Icon name={inputSource === 'local' ? 'gauge' : 'wheel'} size={16} />
+          {inputLabel}
+          {inputSource !== 'local' &&
+            ` · ${wheelStatus === 'connected' ? 'connected' : wheelStatus === 'connecting' ? 'connecting…' : 'not connected'}`}
+        </span>
+      </div>
       <div className="controls">
         <div className="wheel-box" {...steerHandlers} title="Hold left/right half to steer (or ← →)">
           <SteeringWheel angleDeg={state.steeringDeg} />
@@ -97,7 +116,8 @@ export default function DrivingControls({ units, sim, speedKmh, gear, driveModes
         <Pedal label="Accelerator" kind="accel" value={state.accel} handlers={hold(setInput, 'accel')} />
       </div>
       <p className="hint">
-        Press START (or S) first. Keyboard: ↑ accelerate · ↓ brake · ← → steer · P R N D gears. Mouse/touch: hold the pedals or a side of the wheel.
+        Press START (or S) first. Keyboard: ↑ accelerate · ↓ brake · ← → steer · P R N D gears · Q / E turn signals · H
+        hazard. Mouse/touch: hold the pedals or a side of the wheel.
       </p>
     </section>
   );

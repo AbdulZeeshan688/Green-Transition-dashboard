@@ -7,8 +7,32 @@ const metrics = [
 ];
 
 const routes = [
-  { id: 'a', originId: 'x', destinationId: 'y', energyKWh: 2, co2SavedKg: 2, totalUphill: 10, totalDownhill: 30, path: [[0, 0], [1, 1]] },
-  { id: 'b', originId: 'x', destinationId: 'y', energyKWh: 4, co2SavedKg: 1, totalUphill: 5, totalDownhill: 5, path: [[0, 0], [2, 2]] },
+  {
+    id: 'a',
+    originId: 'x',
+    destinationId: 'y',
+    energyKWh: 2,
+    co2SavedKg: 2,
+    totalUphill: 10,
+    totalDownhill: 30,
+    path: [
+      [0, 0],
+      [1, 1],
+    ],
+  },
+  {
+    id: 'b',
+    originId: 'x',
+    destinationId: 'y',
+    energyKWh: 4,
+    co2SavedKg: 1,
+    totalUphill: 5,
+    totalDownhill: 5,
+    path: [
+      [0, 0],
+      [2, 2],
+    ],
+  },
 ];
 
 describe('scoreRoutes', () => {
@@ -21,7 +45,12 @@ describe('scoreRoutes', () => {
   });
   it('returns nothing for no routes or zero weights', () => {
     expect(scoreRoutes([], metrics)).toEqual({});
-    expect(scoreRoutes(routes, metrics.map((m) => ({ ...m, weight: 0 })))).toEqual({});
+    expect(
+      scoreRoutes(
+        routes,
+        metrics.map((m) => ({ ...m, weight: 0 })),
+      ),
+    ).toEqual({});
   });
 });
 
@@ -31,7 +60,10 @@ describe('findRoutes', () => {
   });
   it('reverses stored routes and swaps climb/descent', () => {
     const [rev] = findRoutes(routes, 'y', 'x');
-    expect(rev.path).toEqual([[1, 1], [0, 0]]);
+    expect(rev.path).toEqual([
+      [1, 1],
+      [0, 0],
+    ]);
     expect(rev.totalUphill).toBe(30);
     expect(rev.originId).toBe('y');
   });

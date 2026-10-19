@@ -31,6 +31,8 @@ No values are hardcoded in components. Everything the UI shows is either loaded 
 | `scoring.json` | Route-score metrics and weights | Anyone |
 | `charging.json` | Charger power, charge-limit range, demo speed-up | Anyone |
 | `vehicle-systems.json` | Vehicle systems (Motor, ABS…), which ones block driving, demo scenarios | Telemetry team (later live CAN data) |
+| `cabin.json` | Climate, lights, doors, audio and phone limits and defaults | Anyone |
+| `integrations.json` | Steering wheel / backend addresses and default sources | Integration owners |
 
 Why separate files:
 1. **Non-programmers can change the dashboard.** Adding a vehicle, place or tile, or retuning score weights, means editing JSON only.
@@ -69,7 +71,21 @@ On the dashboard:
 | **Settings** | Choose the vehicle (re-calculates range, energy and routes) and reset the trip. |
 | Vehicle, Route Evaluation | Open the matching tab. |
 
-Interior, Exterior, Climate (side menu) and the bottom-bar icons are part of the visual design only, so they are not clickable. The cabin temperature − / + does work.
+| **Climate** (side menu, fan button) | Driver/passenger temperature with sync, fan level or Auto, A/C, recirculation, defrost, seat and steering-wheel heating |
+| **Interior** | Ambient lighting (colour and brightness, glows on the driver display), reading lights, door lock, child lock |
+| **Exterior** | Headlights (Off/Auto/Low/High), fog lights, hazard lights, fold mirrors; trunk, front trunk and charge port open only when parked |
+| **Phone** (bottom bar) | Bluetooth, pairing, dial pad and call screen. Demo only: no real phone is connected |
+| **Audio** (bottom bar) | Volume and mute |
+
+The bottom bar also has driver and passenger seat heating (tap to cycle levels) and a back arrow. Turn signals and hazard: **Q / E / H**. Doors lock automatically above `autoLockKmh`. All limits and defaults are in `cabin.json`, and the logic is in `src/lib/cabin.js`.
+
+## Connections to other teams
+
+Settings → Connections switches between local sources and external ones (`integrations.json`):
+- **Steering input:** keyboard & touch, or an external steering wheel over WebSocket (CARLA team). Try it with `npm run mock-wheel`.
+- **Route data:** `routes.json`, or Tao's backend (`POST /api/routes`, proxied by Vite in development).
+
+The message formats and setup are in [`../docs/INTEGRATION.md`](../docs/INTEGRATION.md).
 
 ## Not done yet
 
