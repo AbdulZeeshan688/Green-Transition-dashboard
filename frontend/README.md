@@ -70,7 +70,6 @@ On the dashboard:
 | **Comfort** / Drive | Drive mode (acceleration and regen per `drive-modes.json`) and a regenerative-braking switch. With regen off, Sanjeev's downhill-recovery term is set to 0. |
 | **Settings** | Choose the vehicle (re-calculates range, energy and routes) and reset the trip. |
 | Vehicle, Route Evaluation | Open the matching tab. |
-
 | **Climate** (side menu, fan button) | Driver/passenger temperature with sync, fan level or Auto, A/C, recirculation, defrost, seat and steering-wheel heating |
 | **Interior** | Ambient lighting (colour and brightness, glows on the driver display), reading lights, door lock, child lock |
 | **Exterior** | Headlights (Off/Auto/Low/High), fog lights, hazard lights, fold mirrors; trunk, front trunk and charge port open only when parked |
@@ -89,9 +88,10 @@ The message formats and setup are in [`../docs/INTEGRATION.md`](../docs/INTEGRAT
 
 ## Not done yet
 
-- `routes.json` holds **sample** route geometry. Next step: a backend that calls OpenRouteService and returns the same fields.
-- Grid CO₂ is a fixed **32 gCO₂/kWh**, Fingrid's figure for H1 2026. Next step: the backend relays Fingrid dataset 265 live (Sanjeev's `/api/fingrid/co2-intensity`).
-- The map is a schematic SVG drawn from the route `path` points.
+- By default, routes come from the **sample** `routes.json`. Tao's backend can already supply real routes (Settings → Route data), but the team still has to agree on one energy model for frontend and backend.
+- Grid CO₂ is a fixed **32 gCO₂/kWh**, Fingrid's figure for H1 2026. Next step: the backend relays Fingrid dataset 265 live.
+- The map is a schematic SVG drawn from the route `path` points. A real map (Leaflet / OpenStreetMap) is next.
+- The CARLA team's real steering wheel is not connected yet; the dashboard side is ready (`npm run mock-wheel` to test).
 
 ## Structure
 
