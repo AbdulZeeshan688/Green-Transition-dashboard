@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Icon from './Icon';
-import { bestRouteId, findRoutes, scoreRoutes } from '../lib/routeScoring';
+import { bestRouteId, scoreRoutes } from '../lib/routeScoring';
 import { classifyRoutes, evaluateRoute } from '../lib/energyModel';
 import { fmt } from '../lib/format';
 
@@ -65,14 +65,39 @@ function RouteMap({ candidates, selectedId }) {
   );
 }
 
-export default function RouteEvaluation({ routesData, scoring, vehicle, energyModel, units, appliedRouteId, onApply, onClose }) {
-  const { places, routes } = routesData;
+// `provider` comes from services/routeService.js (local sample data or the
+// backend); this screen only asks it for routes between two places.
+export default function RouteEvaluation({
+  provider,
+  sourceLabel,
+  scoring,
+  vehicle,
+  energyModel,
+  units,
+  appliedRouteId,
+  onApply,
+  onClose,
+}) {
+  const { places } = provider;
   const [originId, setOriginId] = useState(places[0]?.id);
   const [destinationId, setDestinationId] = useState(places[1]?.id);
   const [selectedId, setSelectedId] = useState(null);
   const [scores, setScores] = useState(null);
+  const [result, setResult] = useState({ status: 'loading', routes: [], source: null, error: null });
 
-  const candidates = useMemo(() => findRoutes(routes, originId, destinationId), [routes, originId, destinationId]);
+  useEffect(() => {
+    let cancelled = false;
+    setResult((r) => ({ ...r, status: 'loading', error: null }));
+    provider
+      .getRoutes(originId, destinationId)
+      .then(({ routes, source }) => !cancelled && setResult({ status: 'ready', routes, source, error: null }))
+      .catch((error) => !cancelled && setResult({ status: 'error', routes: [], source: null, error: error.message }));
+    return () => {
+      cancelled = true;
+    };
+  }, [provider, originId, destinationId]);
+
+  const candidates = result.routes;
   const evaluated = useMemo(
     () => candidates.map((r) => evaluateRoute(r, vehicle, energyModel)),
     [candidates, vehicle, energyModel],
@@ -148,11 +173,23 @@ export default function RouteEvaluation({ routesData, scoring, vehicle, energyMo
       <RouteMap candidates={candidates} selectedId={selectedId} />
 
       <p className="route-context">
-        Calculated for <strong>{vehicle.make} {vehicle.model}</strong> ({fmt(vehicle.energyConsumption, 1)} kWh/100 km)
-        · grid {fmt(energyModel.gridCo2GPerKWh)} gCO<sub>2</sub>/kWh
+        Calculated for{' '}
+        <strong>
+          {vehicle.make} {vehicle.model}
+        </strong>{' '}
+        ({fmt(vehicle.energyConsumption, 1)} kWh/100 km) · grid {fmt(energyModel.gridCo2GPerKWh)} gCO<sub>2</sub>/kWh ·
+        source: <strong>{sourceLabel}</strong>
+        {result.source && result.source !== 'sample' && ` (${result.source})`}
       </p>
 
-      {candidates.length === 0 ? (
+      {result.status === 'loading' ? (
+        <p className="empty">Loading routes…</p>
+      ) : result.status === 'error' ? (
+        <p className="empty error-text">
+          Could not get routes: {result.error}. Check that the backend is running, or switch the route source to sample
+          data in Settings.
+        </p>
+      ) : candidates.length === 0 ? (
         <p className="empty">No route data for this start/destination pair yet.</p>
       ) : (
         <div className="route-cards">
@@ -189,6 +226,14 @@ export default function RouteEvaluation({ routesData, scoring, vehicle, energyMo
                   <dd className={r.id === ecoId ? 'good' : ''}>
                     {fmt(r.energyKWh, 2)} {units.energy}
                   </dd>
+                  {r.backendEnergyKWh !== undefined && (
+                    <>
+                      <dt title="The backend's own physics-based estimate, for comparison">Backend estimate</dt>
+                      <dd className="muted">
+                        {fmt(r.backendEnergyKWh, 2)} {units.energy}
+                      </dd>
+                    </>
+                  )}
                   <dt>Battery Use</dt>
                   <dd>{fmt(r.batteryUsagePercent, 1)}%</dd>
                   <dt>

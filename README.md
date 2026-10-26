@@ -25,6 +25,8 @@ Built as a group project for **LAB REDI 2026 (task 3.4)**, part of the **Electri
 - **Charging.** Set a charge limit and charge the battery.
 - **Safety.** See the status of Motor, Controller, CAN bus, ABS and ESC. A fault stops the car from driving.
 - **Six vehicles.** Polestar 2, Tesla Model 3, VW ID.3, Hyundai IONIQ 5, Kia EV6 and Nissan Leaf. Switching car recalculates everything.
+- **Every button works like a real car.** Climate (two zones, fan, A/C, defrost, seat and wheel heating), lights (headlights, fog, hazard, ambient colour), doors and openings, turn signals, phone (demo) and volume. Warning lights appear on the driver display.
+- **Ready for the other teams.** A real steering wheel (CARLA team) and Tao's routes backend can be switched on in **Settings**. See [docs/INTEGRATION.md](docs/INTEGRATION.md).
 
 | Route Evaluation | Charging |
 |---|---|
@@ -118,6 +120,7 @@ More details are in [`backend/README.md`](backend/README.md).
 | Brake | **↓** | Hold the brake pedal |
 | Steer | **← →** | Hold the left or right half of the wheel |
 | Change gear | **P R N D** | Click **P R N D** on the display |
+| Turn signals / hazard | **Q** / **E** / **H** | Exterior → Hazard lights |
 
 - The car must be **switched on** before it can drive.
 - You can only switch it **off in P**.
@@ -137,6 +140,7 @@ Run these inside the `frontend` folder:
 | `npm test` | Run the automatic tests (formulas, physics and data files) |
 | `npm run build` | Make the final version in `frontend/dist/` |
 | `npm run preview` | Open the final version at <http://localhost:4173> |
+| `npm run mock-wheel` | Start a fake steering wheel for testing the CARLA connection |
 | `npm run dev -- --host` | Open the dashboard from another device on the same Wi-Fi (use the "Network" address it prints) |
 
 ---
@@ -156,6 +160,8 @@ Nothing is hardcoded. Every value comes from a file in **`frontend/public/data/`
 | `scoring.json` | How routes are scored |
 | `vehicle-systems.json` | Safety systems and demo scenarios |
 | `simulation.json` | Pedal speed, steering speed, animation speed |
+| `cabin.json` | Climate, lights, doors, audio and phone settings |
+| `integrations.json` | Steering wheel and backend addresses, default sources |
 | `ui.json` | Tabs, touchscreen tiles and units |
 
 After editing, run `npm test`. It checks all data files and tells you if something is wrong.
@@ -230,10 +236,14 @@ The full setup is in [`READMEfromOtherGroup.md`](READMEfromOtherGroup.md).
 - [x] Driver display, driving simulation and push-start
 - [x] Energy, battery, range and CO₂ with the team energy model
 - [x] Route evaluation (Eco / Fastest), charging, safety and vehicle selection
-- [x] 45 automatic frontend tests
+- [x] All touchscreen and bottom-bar buttons working (climate, lights, doors, phone, audio)
 - [x] Backend API: real routes from OpenRouteService with energy and CO₂ per route (9 tests)
-- [ ] Connect the dashboard to the backend (replace the sample routes)
+- [x] Dashboard can use the backend for routes (Settings → Route data)
+- [x] Steering input ready for the CARLA team's wheel (Settings → Steering input)
+- [x] 69 automatic frontend tests
+- [ ] Agree on one energy model for frontend and backend
+- [ ] Connect the real CARLA steering wheel
 - [ ] Live electricity CO₂ data from Fingrid
 - [ ] Real map (Leaflet / OpenStreetMap)
 
-Until the dashboard is connected to the backend, its routes, starting battery level and safety scenarios are **sample data**.
+By default the dashboard uses its **sample data** (routes, starting battery level, safety scenarios), so it runs without the backend. The phone screen is a demo; no real phone is connected.

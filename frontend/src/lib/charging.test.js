@@ -29,16 +29,26 @@ describe('systemsSummary', () => {
   ];
 
   it('is ok when all systems are ok', () => {
-    expect(systemsSummary(systems, { motor: 'ok', abs: 'ok' })).toEqual({ level: 'ok', drivingBlocked: false, blockedBy: [] });
+    expect(systemsSummary(systems, { motor: 'ok', abs: 'ok' })).toEqual({
+      level: 'ok',
+      drivingBlocked: false,
+      blockedBy: [],
+    });
   });
 
   it('reports the worst level; only blocking systems stop driving', () => {
-    expect(systemsSummary(systems, { motor: 'ok', abs: 'error' })).toMatchObject({ level: 'error', drivingBlocked: false });
+    expect(systemsSummary(systems, { motor: 'ok', abs: 'error' })).toMatchObject({
+      level: 'error',
+      drivingBlocked: false,
+    });
     expect(systemsSummary(systems, { motor: 'error', abs: 'warning' })).toMatchObject({
       level: 'error',
       drivingBlocked: true,
       blockedBy: ['Motor'],
     });
-    expect(systemsSummary(systems, { motor: 'warning', abs: 'ok' })).toMatchObject({ level: 'warning', drivingBlocked: false });
+    expect(systemsSummary(systems, { motor: 'warning', abs: 'ok' })).toMatchObject({
+      level: 'warning',
+      drivingBlocked: false,
+    });
   });
 });

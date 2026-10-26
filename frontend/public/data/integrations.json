@@ -1,0 +1,35 @@
+{
+  "description": "Connections to other teams. Each one has a local default (works offline) and an external source that can be switched in Settings. See docs/INTEGRATION.md.",
+  "driverInput": {
+    "defaultSource": "local",
+    "sources": [
+      { "id": "local", "label": "Keyboard & touch" },
+      { "id": "wheel", "label": "External steering wheel (CARLA team)" }
+    ],
+    "wheel": {
+      "transport": "websocket",
+      "url": "ws://localhost:8765",
+      "reconnectSeconds": 3,
+      "staleMs": 500,
+      "stateIntervalMs": 100
+    }
+  },
+  "routes": {
+    "defaultSource": "local",
+    "sources": [
+      { "id": "local", "label": "Sample routes (routes.json)" },
+      { "id": "backend", "label": "Backend API (Tao)" }
+    ],
+    "backend": {
+      "baseUrl": "",
+      "path": "/api/routes",
+      "timeoutMs": 15000,
+      "places": [
+        { "id": "lahti", "name": "Lahti", "coords": [25.6612, 60.9827] },
+        { "id": "heinola", "name": "Heinola", "coords": [26.038, 61.205] },
+        { "id": "helsinki", "name": "Helsinki", "coords": [24.9384, 60.1699] },
+        { "id": "porvoo", "name": "Porvoo", "coords": [25.6651, 60.3932] }
+      ]
+    }
+  }
+}

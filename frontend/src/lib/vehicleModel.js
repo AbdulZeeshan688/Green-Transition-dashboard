@@ -6,13 +6,18 @@ export const kmhToMs = (kmh) => kmh / 3.6;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-// Pedals ramp from 0 to 1 over `rampSeconds` instead of jumping instantly.
-export function rampPedal(current, held, dt, rampSeconds) {
+// Keyboard pedals ramp towards their target over `rampSeconds` instead of
+// jumping. `target` is true/false (key held) or a pedal position 0..1.
+export function rampPedal(current, target, dt, rampSeconds) {
+  const goal = typeof target === 'number' ? clamp(target, 0, 1) : target ? 1 : 0;
   const delta = dt / rampSeconds;
-  return held ? Math.min(1, current + delta) : Math.max(0, current - delta);
+  return goal > current ? Math.min(goal, current + delta) : Math.max(goal, current - delta);
 }
 
-export function nextSteering(angleDeg, { left, right }, dt, sim, maxDeg) {
+// An external wheel sends an absolute angle (`steeringDeg`), which is used as-is.
+// Keyboard/touch steering turns at a fixed rate while held and self-centres.
+export function nextSteering(angleDeg, { left, right, steeringDeg }, dt, sim, maxDeg) {
+  if (typeof steeringDeg === 'number') return clamp(steeringDeg, -maxDeg, maxDeg);
   const direction = (right ? 1 : 0) - (left ? 1 : 0);
   if (direction !== 0) {
     return clamp(angleDeg + direction * sim.steeringRateDegPerSec * dt, -maxDeg, maxDeg);
@@ -45,10 +50,16 @@ export function canPowerOff(gear) {
 export const INITIAL_SIM_STATE = { speedMs: 0, steeringDeg: 0, accel: 0, brake: 0, tripKm: 0, roadM: 0 };
 
 // `ready` = vehicle switched on. When off, the accelerator does nothing;
-// brake and steering still respond, as in a real car.
+// brake and steering still respond, as in a real car. Real (analog) pedals
+// from an external device are followed directly instead of ramped.
 export function stepSimulation(prev, inputs, { vehicle, mode, gear, sim, ready }, dt) {
-  const accel = rampPedal(prev.accel, ready && inputs.accel, dt, sim.pedalRampSeconds);
-  const brake = rampPedal(prev.brake, inputs.brake, dt, sim.pedalRampSeconds);
+  const accelTarget = ready ? inputs.accel : 0;
+  const accel = inputs.analogPedals
+    ? clamp(Number(accelTarget) || 0, 0, 1)
+    : rampPedal(prev.accel, accelTarget, dt, sim.pedalRampSeconds);
+  const brake = inputs.analogPedals
+    ? clamp(Number(inputs.brake) || 0, 0, 1)
+    : rampPedal(prev.brake, inputs.brake, dt, sim.pedalRampSeconds);
   const speedMs = nextSpeed(prev.speedMs, { accel, brake }, gear, mode, vehicle, dt);
   const steeringDeg = nextSteering(prev.steeringDeg, inputs, dt, sim, vehicle.maxSteeringDeg);
   const travelledM = ((prev.speedMs + speedMs) / 2) * dt;

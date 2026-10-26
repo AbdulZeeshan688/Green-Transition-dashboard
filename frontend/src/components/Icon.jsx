@@ -93,6 +93,76 @@ const PATHS = {
       <path d="M6.3 6.8a8 8 0 1 0 11.4 0" />
     </>
   ),
+  snow: <path d="M12 2v20M4.2 6.5l15.6 9M4.2 17.5l15.6-9M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5" />,
+  recirc: (
+    <>
+      <path d="M4 14a8 8 0 0 1 15-4" />
+      <path d="M19 5v5h-5" />
+      <path d="M5 19h14" />
+    </>
+  ),
+  defrostFront: (
+    <>
+      <path d="M3 18c3-9 15-9 18 0z" />
+      <path d="M9 7c-1 1 1 2 0 3M12 6c-1 1 1 2 0 3M15 7c-1 1 1 2 0 3" />
+    </>
+  ),
+  defrostRear: (
+    <>
+      <rect x="3" y="5" width="18" height="12" rx="2" />
+      <path d="M8 21c-1-1 1-2 0-3M12 21c-1-1 1-2 0-3M16 21c-1-1 1-2 0-3" />
+    </>
+  ),
+  lock: (
+    <>
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </>
+  ),
+  unlock: (
+    <>
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 7.5-2" />
+    </>
+  ),
+  backspace: (
+    <>
+      <path d="M21 5H8l-6 7 6 7h13z" />
+      <path d="M12 9l6 6M18 9l-6 6" />
+    </>
+  ),
+  volumeOff: (
+    <>
+      <path d="M4 9v6h4l5 4V5L8 9z" />
+      <path d="M16 9l5 6M21 9l-5 6" />
+    </>
+  ),
+  headlight: (
+    <>
+      <path d="M10 6C5 6 3 9 3 12s2 6 7 6z" />
+      <path d="M14 8h7M14 12h7M14 16h7" />
+    </>
+  ),
+  fog: (
+    <>
+      <path d="M10 6C5 6 3 9 3 12s2 6 7 6z" />
+      <path d="M14 8l7 0M14 12h7M14 16h7M17 6c-1 4 1 8 0 12" />
+    </>
+  ),
+  arrowLeftFill: <path d="M3 12l8-7v4h10v6H11v4z" fill="currentColor" />,
+  arrowRightFill: <path d="M21 12l-8-7v4H3v6h10v4z" fill="currentColor" />,
+  hazard: (
+    <>
+      <path d="M12 3l10 17H2z" />
+      <path d="M12 9l5 8.5H7z" />
+    </>
+  ),
+  doorOpen: (
+    <>
+      <path d="M4 20V4h9l5 5v11z" />
+      <path d="M13 4v5h5M9 14h3" />
+    </>
+  ),
   swap: <path d="M4 8h15l-3.5-3.5M20 16H5l3.5 3.5" />,
   close: <path d="M6 6l12 12M18 6L6 18" />,
   clock: (
