@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import Header from './Header';
 import DriverDisplay from './DriverDisplay';
 import DrivingControls from './DrivingControls';
@@ -6,15 +6,20 @@ import TouchScreen from './TouchScreen';
 import RouteEvaluation from './RouteEvaluation';
 import VehicleStatus from './VehicleStatus';
 import { ChargingPanel, ComfortPanel, SafetyPanel, SettingsPanel } from './TouchPanels';
+import { AudioPanel, ClimatePanel, ExteriorPanel, InteriorPanel, PhonePanel } from './CabinPanels';
 import { useSimulation } from '../hooks/useSimulation';
+import { useExternalWheel } from '../hooks/useExternalWheel';
 import { canPowerOff, canShift, msToKmh } from '../lib/vehicleModel';
 import { baseEnergyRate, co2Kg, estimateRangeKm, evaluateRoute, remainingSocPercent } from '../lib/energyModel';
 import { chargeStep } from '../lib/charging';
 import { systemsSummary } from '../lib/vehicleSystems';
+import { cabinReducer, canOpenPart, initialCabin, openParts, shouldAutoLock } from '../lib/cabin';
+import { createRouteProvider } from '../services/routeService';
 
 const KEY_INPUTS = { ArrowUp: 'accel', ArrowDown: 'brake', ArrowLeft: 'left', ArrowRight: 'right' };
 const KEY_GEARS = { p: 'P', r: 'R', n: 'N', d: 'D' };
 const KEY_POWER = 's';
+const KEY_SIGNALS = { q: 'left', e: 'right', h: 'hazard' };
 
 function tabFromHash(tabs) {
   const id = window.location.hash.slice(1);
@@ -22,8 +27,20 @@ function tabFromHash(tabs) {
 }
 
 export default function Dashboard({ data }) {
-  const { ui, vehicles, vehicleState, driveModes, simulation, routes, scoring, energyModel, charging, vehicleSystems } =
-    data;
+  const {
+    ui,
+    vehicles,
+    vehicleState,
+    driveModes,
+    simulation,
+    routes,
+    scoring,
+    energyModel,
+    charging,
+    vehicleSystems,
+    integrations,
+    cabin: cabinCfg,
+  } = data;
 
   // The active tab is mirrored in the URL hash (#route, #vehicle) so views can be linked directly.
   const [tab, setTabState] = useState(() => tabFromHash(ui.tabs));
@@ -40,7 +57,16 @@ export default function Dashboard({ data }) {
   const [registration, setRegistration] = useState(vehicleState.registrationNumber);
   const [gear, setGear] = useState(vehicleState.gear);
   const [modeId, setModeId] = useState(vehicleState.driveMode);
-  const [cabinTempC, setCabinTempC] = useState(vehicleState.cabinTempC);
+  const [cabin, dispatchCabin] = useReducer(cabinReducer, undefined, () =>
+    initialCabin(cabinCfg, { driverTempC: vehicleState.cabinTempC }),
+  );
+  // Where driver inputs and routes come from (switchable in Settings).
+  const [inputSource, setInputSource] = useState(integrations.driverInput.defaultSource);
+  const [routeSource, setRouteSource] = useState(integrations.routes.defaultSource);
+  const routeProvider = useMemo(
+    () => createRouteProvider(routeSource, { routesData: routes, integrations }),
+    [routeSource, routes, integrations],
+  );
   const [appliedRoute, setAppliedRoute] = useState(null);
   const [notice, setNotice] = useState(null);
   // Vehicle power: 'off' -> 'starting' (for simulation.startupSeconds) -> 'ready'.
@@ -60,7 +86,23 @@ export default function Dashboard({ data }) {
   const vehicle = { ...simulation.vehicleDefaults, ...vehicleSpec };
   const mode = driveModes.find((m) => m.id === modeId) ?? driveModes[0];
   const ready = power === 'ready' && !systems.drivingBlocked;
-  const sim = useSimulation({ vehicle, mode, gear, ready, config: simulation });
+  const wheelCfg = integrations.driverInput.wheel;
+  const requestGearRef = useRef(null);
+  const wheel = useExternalWheel({
+    enabled: inputSource !== 'local',
+    config: wheelCfg,
+    maxSteeringDeg: vehicle.maxSteeringDeg,
+    onGear: (g) => requestGearRef.current?.(g),
+  });
+  const sim = useSimulation({
+    vehicle,
+    mode,
+    gear,
+    ready,
+    config: simulation,
+    externalRef: wheel.externalRef,
+    staleMs: wheelCfg.staleMs,
+  });
   const { setInput, resetTrip } = sim;
 
   const speedKmh = msToKmh(sim.state.speedMs);
@@ -86,12 +128,15 @@ export default function Dashboard({ data }) {
         setNotice('Press START to switch the vehicle on');
       } else if (canShift(target, speedKmh, simulation.gearChangeMaxKmh)) {
         setGear(target);
+        const open = openParts(cabin, cabinCfg.body);
+        if ((target === 'D' || target === 'R') && open.length) setNotice(`Warning: ${open.join(', ')} open`);
       } else {
         setNotice(`Slow down below ${simulation.gearChangeMaxKmh} ${ui.units.speed} to shift to ${target}`);
       }
     },
-    [power, speedKmh, simulation.gearChangeMaxKmh, ui.units.speed],
+    [power, speedKmh, simulation.gearChangeMaxKmh, ui.units.speed, cabin, cabinCfg.body],
   );
+  requestGearRef.current = requestGear;
 
   const togglePower = useCallback(() => {
     if (power === 'off' && isCharging) {
@@ -124,6 +169,8 @@ export default function Dashboard({ data }) {
         requestGear(KEY_GEARS[e.key.toLowerCase()]);
       } else if (e.key.toLowerCase() === KEY_POWER && !e.repeat) {
         togglePower();
+      } else if (KEY_SIGNALS[e.key.toLowerCase()] && !e.repeat) {
+        dispatchCabin({ type: 'signal', side: KEY_SIGNALS[e.key.toLowerCase()] });
       }
     };
     const up = (e) => {
@@ -162,8 +209,52 @@ export default function Dashboard({ data }) {
   const toggleCharging = () => {
     if (isCharging) setIsCharging(false);
     else if (power !== 'off') setNotice('Switch the vehicle off (STOP) to charge');
-    else setIsCharging(true);
+    else {
+      dispatchCabin({ type: 'bodyPart', part: 'chargePort', open: true }); // plugging in opens the port
+      setIsCharging(true);
+    }
   };
+
+  // Doors lock automatically once the car is moving.
+  useEffect(() => {
+    if (shouldAutoLock(cabin, speedKmh, cabinCfg.body)) {
+      dispatchCabin({ type: 'set', group: 'body', key: 'locked', value: true });
+      setNotice('Doors locked automatically');
+    }
+  }, [cabin, speedKmh, cabinCfg.body]);
+
+  // Send the car's state back to an external wheel/simulator (e.g. for CARLA or
+  // force feedback). Values are read from a ref so the timer isn't restarted.
+  const wheelState = useRef(null);
+  wheelState.current = {
+    type: 'state',
+    speedKmh: +speedKmh.toFixed(2),
+    steeringDeg: +sim.state.steeringDeg.toFixed(1),
+    gear,
+    power,
+    socPercent: +socPercent.toFixed(2),
+  };
+  const { send: sendToWheel, status: wheelStatus } = wheel;
+  useEffect(() => {
+    if (wheelStatus !== 'connected') return undefined;
+    const id = setInterval(() => sendToWheel(wheelState.current), wheelCfg.stateIntervalMs);
+    return () => clearInterval(id);
+  }, [wheelStatus, sendToWheel, wheelCfg.stateIntervalMs]);
+
+  const toggleLock = () => dispatchCabin({ type: 'toggle', group: 'body', key: 'locked' });
+  const toggleBodyPart = (part, open) => {
+    if (open && !canOpenPart(part, { speedKmh, gear }, cabinCfg.body)) {
+      setNotice('Stop and shift to P to open this');
+      return;
+    }
+    if (!open && part === 'chargePort' && isCharging) {
+      setNotice('Stop charging before closing the charge port');
+      return;
+    }
+    dispatchCabin({ type: 'bodyPart', part, open });
+  };
+  const ambientColor = cabinCfg.lights.ambientColors.find((c) => c.id === cabin.lights.ambientColor);
+  const backHome = () => setPanel('home');
 
   const applyRoute = (route) => {
     setAppliedRoute(route);
@@ -179,7 +270,10 @@ export default function Dashboard({ data }) {
   };
 
   const changeTemp = (delta) =>
-    setCabinTempC((t) => Math.min(simulation.climateMaxC, Math.max(simulation.climateMinC, t + delta)));
+    dispatchCabin({ type: 'temp', zone: 'driver', delta, min: simulation.climateMinC, max: simulation.climateMaxC });
+  const seatHeat = (seat) => dispatchCabin({ type: 'seatHeat', seat, levels: cabinCfg.climate.seatHeatLevels });
+  const inputLabel = integrations.driverInput.sources.find((s) => s.id === inputSource)?.label;
+  const routeSourceLabel = integrations.routes.sources.find((s) => s.id === routeSource)?.label;
 
   return (
     <div className="app">
@@ -211,6 +305,14 @@ export default function Dashboard({ data }) {
             charging={isCharging}
             roadOffsetPx={sim.state.roadM * simulation.roadScrollPxPerM}
             roadDashPx={simulation.roadDashPx}
+            cabin={cabin}
+            ambient={
+              cabin.lights.ambientOn && ambientColor
+                ? { hex: ambientColor.hex, brightness: cabin.lights.ambientBrightness }
+                : null
+            }
+            blinkMs={cabinCfg.lights.signalBlinkMs}
+            openPartLabels={openParts(cabin, cabinCfg.body)}
           />
           <DrivingControls
             units={ui.units}
@@ -220,6 +322,9 @@ export default function Dashboard({ data }) {
             driveModes={driveModes}
             modeId={modeId}
             onModeChange={setModeId}
+            inputSource={inputSource}
+            inputLabel={inputLabel}
+            wheelStatus={wheel.status}
           />
         </div>
         <div className="right-col">
@@ -228,9 +333,12 @@ export default function Dashboard({ data }) {
               ui={ui}
               vehicle={vehicle}
               rangeKm={rangeKm}
-              cabinTempC={cabinTempC}
-              onTempChange={changeTemp}
+              cabin={cabin}
+              cabinCfg={cabinCfg}
               climate={simulation}
+              onTemp={changeTemp}
+              onSeatHeat={seatHeat}
+              onToggleLock={toggleLock}
               onOpenTab={setTab}
               panel={panel}
               onOpenPanel={setPanel}
@@ -277,14 +385,56 @@ export default function Dashboard({ data }) {
                   onResetTrip={resetTrip}
                   tripKm={sim.state.tripKm}
                   units={ui.units}
-                  onBack={() => setPanel('home')}
+                  integrations={integrations}
+                  inputSource={inputSource}
+                  onInputSourceChange={setInputSource}
+                  wheelStatus={wheel.status}
+                  routeSource={routeSource}
+                  onRouteSourceChange={setRouteSource}
+                  onBack={backHome}
                 />
+              )}
+              {panel === 'climate' && (
+                <ClimatePanel
+                  cabin={cabin}
+                  dispatch={dispatchCabin}
+                  cfg={cabinCfg.climate}
+                  limits={simulation}
+                  units={ui.units}
+                  onBack={backHome}
+                />
+              )}
+              {panel === 'interior' && (
+                <InteriorPanel
+                  cabin={cabin}
+                  dispatch={dispatchCabin}
+                  cfg={cabinCfg}
+                  onToggleLock={toggleLock}
+                  onBack={backHome}
+                />
+              )}
+              {panel === 'exterior' && (
+                <ExteriorPanel
+                  cabin={cabin}
+                  dispatch={dispatchCabin}
+                  cfg={cabinCfg}
+                  onTogglePart={toggleBodyPart}
+                  onBack={backHome}
+                />
+              )}
+              {panel === 'phone' && (
+                <PhonePanel cabin={cabin} dispatch={dispatchCabin} cfg={cabinCfg.phone} onBack={backHome} />
+              )}
+              {panel === 'audio' && (
+                <AudioPanel cabin={cabin} dispatch={dispatchCabin} cfg={cabinCfg.audio} onBack={backHome} />
               )}
             </TouchScreen>
           )}
           {tab === 'route' && (
             <RouteEvaluation
-              routesData={routes}
+              key={routeSource}
+              provider={routeProvider}
+              sourceLabel={routeSourceLabel}
               scoring={scoring}
               vehicle={vehicle}
               energyModel={activeModel}

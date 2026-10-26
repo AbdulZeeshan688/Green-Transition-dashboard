@@ -39,10 +39,7 @@ export function scoreRoutes(routes, metrics) {
 
   return Object.fromEntries(
     routes.map((route) => {
-      const weighted = active.reduce(
-        (sum, m) => sum + m.weight * ratio(route[m.key], best[m.key], m.better),
-        0,
-      );
+      const weighted = active.reduce((sum, m) => sum + m.weight * ratio(route[m.key], best[m.key], m.better), 0);
       return [route.id, Math.round((weighted / totalWeight) * 100)];
     }),
   );

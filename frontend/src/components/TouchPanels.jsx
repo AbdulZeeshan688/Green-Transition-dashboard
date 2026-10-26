@@ -3,7 +3,7 @@ import { energyToLimitKWh, formatDuration, hoursToLimit } from '../lib/charging'
 import { estimateRangeKm } from '../lib/energyModel';
 import { fmt } from '../lib/format';
 
-function PanelHeader({ title, subtitle, onBack }) {
+export function PanelHeader({ title, subtitle, onBack }) {
   return (
     <div className="panel-head">
       <button className="icon-btn" aria-label="Back to home" onClick={onBack}>
@@ -17,7 +17,7 @@ function PanelHeader({ title, subtitle, onBack }) {
   );
 }
 
-function Row({ label, value }) {
+export function Row({ label, value }) {
   return (
     <div className="panel-row">
       <span className="muted">{label}</span>
@@ -183,10 +183,67 @@ export function ComfortPanel({ driveModes, modeId, onModeChange, regenEnabled, o
   );
 }
 
-export function SettingsPanel({ vehicles, vehicle, onVehicleChange, onResetTrip, tripKm, units, onBack }) {
+const WHEEL_STATUS = {
+  off: 'Not used',
+  connecting: 'Connecting…',
+  connected: 'Connected',
+  disconnected: 'Not connected — retrying',
+};
+
+export function SettingsPanel({
+  vehicles,
+  vehicle,
+  onVehicleChange,
+  onResetTrip,
+  tripKm,
+  units,
+  integrations,
+  inputSource,
+  onInputSourceChange,
+  wheelStatus,
+  routeSource,
+  onRouteSourceChange,
+  onBack,
+}) {
+  const { driverInput, routes } = integrations;
   return (
     <div className="panel">
       <PanelHeader title="Settings" onBack={onBack} />
+
+      <span className="section-label">Steering input</span>
+      <div className="segmented">
+        {driverInput.sources.map((src) => (
+          <button
+            key={src.id}
+            className={src.id === inputSource ? 'active' : ''}
+            onClick={() => onInputSourceChange(src.id)}
+          >
+            {src.label}
+          </button>
+        ))}
+      </div>
+      {inputSource !== 'local' && (
+        <div className="panel-card">
+          <Row label="Wheel address" value={driverInput.wheel.url} />
+          <Row
+            label="Status"
+            value={<span className={`conn ${wheelStatus}`}>{WHEEL_STATUS[wheelStatus] ?? wheelStatus}</span>}
+          />
+        </div>
+      )}
+
+      <span className="section-label">Route data</span>
+      <div className="segmented">
+        {routes.sources.map((src) => (
+          <button
+            key={src.id}
+            className={src.id === routeSource ? 'active' : ''}
+            onClick={() => onRouteSourceChange(src.id)}
+          >
+            {src.label}
+          </button>
+        ))}
+      </div>
 
       <span className="section-label">Vehicle</span>
       <div className="vehicle-list">
