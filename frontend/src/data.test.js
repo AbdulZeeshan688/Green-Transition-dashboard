@@ -34,6 +34,10 @@ describe('data files', () => {
     for (const v of vehicles.filter((x) => x.image)) {
       expect(existsSync(new URL(`../public/${v.image}`, import.meta.url)), `${v.registrationNumber}.image`).toBe(true);
     }
+    const wheels = [sim.vehicleDefaults.steeringWheelImage, ...vehicles.map((v) => v.steeringWheelImage)].filter(
+      Boolean,
+    );
+    for (const img of wheels) expect(existsSync(new URL(`../public/${img}`, import.meta.url)), img).toBe(true);
     for (const key of ['maxReverseKmh', 'maxBrakeDecelMs2', 'maxSteeringDeg']) {
       expect(positive(sim.vehicleDefaults[key]), key).toBe(true);
     }
@@ -73,7 +77,15 @@ describe('data files', () => {
   it('simulation timing values are positive', () => {
     expect(sim.roadDashPx.length).toBe(2);
     sim.roadDashPx.forEach((n) => expect(positive(n)).toBe(true));
-    for (const key of ['tickMs', 'pedalRampSeconds', 'steeringRateDegPerSec', 'steeringReturnDegPerSec', 'climateStepC', 'startupSeconds', 'roadScrollPxPerM']) {
+    for (const key of [
+      'tickMs',
+      'pedalRampSeconds',
+      'steeringRateDegPerSec',
+      'steeringReturnDegPerSec',
+      'climateStepC',
+      'startupSeconds',
+      'roadScrollPxPerM',
+    ]) {
       expect(positive(sim[key]), key).toBe(true);
     }
   });
@@ -93,7 +105,17 @@ describe('data files', () => {
   });
 
   it('scoring metrics are valid and exist on evaluated routes', () => {
-    const computed = ['distanceKm', 'durationMin', 'totalUphill', 'totalDownhill', 'energyKWh', 'co2Kg', 'batteryUsagePercent', 'regeneratedKWh', 'averageSpeedKmh'];
+    const computed = [
+      'distanceKm',
+      'durationMin',
+      'totalUphill',
+      'totalDownhill',
+      'energyKWh',
+      'co2Kg',
+      'batteryUsagePercent',
+      'regeneratedKWh',
+      'averageSpeedKmh',
+    ];
     for (const m of scoring.metrics) {
       expect(computed, m.key).toContain(m.key);
       expect(['lower', 'higher']).toContain(m.better);
@@ -121,7 +143,10 @@ describe('data files', () => {
   it('integrations: default sources exist and backend places have coordinates', () => {
     for (const group of [integrations.driverInput, integrations.routes]) {
       expect(unique(group.sources.map((x) => x.id))).toBe(true);
-      expect(group.sources.some((x) => x.id === group.defaultSource), group.defaultSource).toBe(true);
+      expect(
+        group.sources.some((x) => x.id === group.defaultSource),
+        group.defaultSource,
+      ).toBe(true);
     }
     const wheel = integrations.driverInput.wheel;
     expect(wheel.url).toMatch(/^wss?:\/\//);

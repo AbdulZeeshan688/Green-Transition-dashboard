@@ -44,6 +44,8 @@ export default function DrivingControls({
   inputSource,
   inputLabel,
   wheelStatus,
+  wheelImage,
+  wheelAlt,
 }) {
   const { state, setInput } = sim;
 
@@ -76,7 +78,7 @@ export default function DrivingControls({
       </div>
       <div className="controls">
         <div className="wheel-box" {...steerHandlers} title="Hold left/right half to steer (or ← →)">
-          <SteeringWheel angleDeg={state.steeringDeg} />
+          <SteeringWheel angleDeg={state.steeringDeg} image={wheelImage} alt={wheelAlt} />
         </div>
 
         <div className="readouts">
