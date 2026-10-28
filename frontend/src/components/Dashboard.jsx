@@ -325,6 +325,8 @@ export default function Dashboard({ data }) {
             inputSource={inputSource}
             inputLabel={inputLabel}
             wheelStatus={wheel.status}
+            wheelImage={vehicle.steeringWheelImage}
+            wheelAlt={`${vehicle.make} ${vehicle.model} steering wheel`}
           />
         </div>
         <div className="right-col">

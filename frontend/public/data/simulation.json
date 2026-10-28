@@ -16,6 +16,8 @@
   "vehicleDefaults": {
     "maxReverseKmh": 20,
     "maxBrakeDecelMs2": 8,
-    "maxSteeringDeg": 540
+    "maxSteeringDeg": 540,
+    "steeringWheelImage": "images/polestar-2-steering-wheel.png",
+    "steeringWheelImageSource": "Polestar 2 interior photo (collaboration partner), wheel cut out by the team"
   }
 }
