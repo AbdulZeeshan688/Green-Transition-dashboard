@@ -9,7 +9,21 @@ export function StarLogo({ size = 40 }) {
   );
 }
 
-export function SteeringWheel({ angleDeg }) {
+// Uses the wheel photo from the vehicle data ("steeringWheelImage", relative
+// to public/) when there is one; otherwise the drawn wheel below. The photo
+// must be centred on the hub so that rotate() turns it around the middle.
+export function SteeringWheel({ angleDeg, image, alt }) {
+  if (image) {
+    return (
+      <img
+        className="steering-img"
+        src={`${import.meta.env.BASE_URL}${image}`}
+        alt={alt}
+        draggable="false"
+        style={{ transform: `rotate(${angleDeg}deg)` }}
+      />
+    );
+  }
   return (
     <svg
       viewBox="0 0 200 200"
