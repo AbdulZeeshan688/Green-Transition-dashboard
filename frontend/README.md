@@ -25,7 +25,7 @@ No values are hardcoded in components. Everything the UI shows is either loaded 
 | `vehicles.json` | Vehicle specs, same field names as Sanjeev's model (`batteryCapacity`, `energyConsumption`) | Vehicle-data team |
 | `vehicle-state.json` | Initial telemetry snapshot (SoC, gear, mode, climate) | Telemetry team (later a live feed) |
 | `drive-modes.json` | Acceleration / coasting / regen per drive mode | Anyone |
-| `simulation.json` | Pedal ramp time, steering speed, shift speed limit, climate limits, default vehicle dynamics | Anyone |
+| `simulation.json` | Pedal ramp time, steering speed, shift speed limit, climate limits, default vehicle dynamics and steering-wheel image (`vehicleDefaults`; a vehicle can override `steeringWheelImage`) | Anyone |
 | `energy-model.json` | Sanjeev's uphill/regen factors, grid CO₂ intensity (with sources) | Energy-model owner |
 | `routes.json` | Places and route candidates: distance, duration, uphill/downhill (**sample data**) | Routing team (OpenRouteService) |
 | `scoring.json` | Route-score metrics and weights | Anyone |

@@ -549,6 +549,18 @@ select {
   transition: transform 50ms linear;
 }
 
+.steering-img {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.28));
+  transition: transform 50ms linear;
+  user-select: none;
+  pointer-events: none;
+}
+
 .readouts {
   display: flex;
   flex-direction: column;
