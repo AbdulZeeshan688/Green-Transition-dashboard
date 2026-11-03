@@ -11,7 +11,7 @@ import { useSimulation } from '../hooks/useSimulation';
 import { useExternalWheel } from '../hooks/useExternalWheel';
 import { canPowerOff, canShift, msToKmh } from '../lib/vehicleModel';
 import { baseEnergyRate, co2Kg, estimateRangeKm, evaluateRoute, remainingSocPercent } from '../lib/energyModel';
-import { chargeStep } from '../lib/charging';
+import { chargeStep, chargingPower } from '../lib/charging';
 import { systemsSummary } from '../lib/vehicleSystems';
 import { cabinReducer, canOpenPart, initialCabin, openParts, shouldAutoLock } from '../lib/cabin';
 import { createRouteProvider } from '../services/routeService';
@@ -76,6 +76,7 @@ export default function Dashboard({ data }) {
   const [baseSocPercent, setBaseSocPercent] = useState(vehicleState.socPercent);
   const [isCharging, setIsCharging] = useState(false);
   const [chargeLimit, setChargeLimit] = useState(charging.defaultLimitPercent);
+  const [chargerId, setChargerId] = useState(charging.defaultChargerId);
   const [regenEnabled, setRegenEnabled] = useState(vehicleState.regenEnabled);
   const [scenarioId, setScenarioId] = useState(vehicleSystems.defaultScenario);
 
@@ -187,6 +188,11 @@ export default function Dashboard({ data }) {
     };
   }, [setInput, requestGear, togglePower]);
 
+  // Charging power = the lower of the charger and the car's verified limit.
+  const charger = charging.chargers.find((c) => c.id === chargerId) ?? charging.chargers[0];
+  const chargePower = chargingPower(charger, vehicle);
+  const chargePowerKW = chargePower.kw;
+
   // Charging: power × time, sped up by charging.demoTimeScale for the demo.
   useEffect(() => {
     if (!isCharging) return undefined;
@@ -196,7 +202,7 @@ export default function Dashboard({ data }) {
       const hours = ((now - last) / 1000 / 3600) * charging.demoTimeScale;
       last = now;
       const current = socRef.current;
-      const next = chargeStep(current, chargeLimit, charging.chargerPowerKW, vehicle, hours);
+      const next = chargeStep(current, chargeLimit, chargePowerKW, vehicle, hours);
       setBaseSocPercent((b) => b + (next - current));
       if (next >= chargeLimit) {
         setIsCharging(false);
@@ -204,11 +210,12 @@ export default function Dashboard({ data }) {
       }
     }, simulation.tickMs);
     return () => clearInterval(id);
-  }, [isCharging, chargeLimit, charging, vehicle.batteryCapacity, simulation.tickMs]);
+  }, [isCharging, chargeLimit, charging, chargePowerKW, vehicle.batteryCapacity, simulation.tickMs]);
 
   const toggleCharging = () => {
     if (isCharging) setIsCharging(false);
     else if (power !== 'off') setNotice('Switch the vehicle off (STOP) to charge');
+    else if (!chargePower.compatible) setNotice(chargePower.note);
     else {
       dispatchCabin({ type: 'bodyPart', part: 'chargePort', open: true }); // plugging in opens the port
       setIsCharging(true);
@@ -355,6 +362,8 @@ export default function Dashboard({ data }) {
                   onLimitChange={setChargeLimit}
                   charging={isCharging}
                   onToggleCharging={toggleCharging}
+                  chargerId={chargerId}
+                  onChargerChange={setChargerId}
                   onBack={() => setPanel('home')}
                 />
               )}

@@ -29,7 +29,7 @@ No values are hardcoded in components. Everything the UI shows is either loaded 
 | `energy-model.json` | Sanjeev's uphill/regen factors, grid CO₂ intensity (with sources) | Energy-model owner |
 | `routes.json` | Places and route candidates: distance, duration, uphill/downhill (**sample data**) | Routing team (OpenRouteService) |
 | `scoring.json` | Route-score metrics and weights | Anyone |
-| `charging.json` | Charger power, charge-limit range, demo speed-up | Anyone |
+| `charging.json` | Chargers (Type 2 AC, CCS2 DC), charge-limit range, demo speed-up | Anyone |
 | `vehicle-systems.json` | Vehicle systems (Motor, ABS…), which ones block driving, demo scenarios | Telemetry team (later live CAN data) |
 | `cabin.json` | Climate, lights, doors, audio and phone limits and defaults | Anyone |
 | `integrations.json` | Steering wheel / backend addresses and default sources | Integration owners |
@@ -65,7 +65,7 @@ On the dashboard:
 
 | Tile / menu | What it does |
 |---|---|
-| **Charging** | Set a charge limit and charge. SoC rises by `power × time / capacity`. Shows energy and **real** time to the limit; the on-screen demo runs `demoTimeScale`× faster. The vehicle must be off to charge. |
+| **Charging** | Choose **AC (Type 2, 11 kW)** or **DC fast charging (CCS2, 150 kW)**, set a charge limit and charge. Power = the lower of the charger and the car's verified limit (`vehicles.json` → `charging`); for DC, the average over 10–80 % is used. A car with another plug (e.g. Nissan Leaf, CHAdeMO) can't use CCS2. SoC rises by `power × time / capacity`; time to the limit is real time, the on-screen demo runs `demoTimeScale`× faster. The vehicle must be off to charge. |
 | **Safety** | Live status of Motor, Controller, CAN bus, ABS and ESC. A fault in a system marked `blocksDriving` disables driving (display shows FAULT), and the header pill switches to WARNING/FAULT. |
 | **Comfort** / Drive | Drive mode (acceleration and regen per `drive-modes.json`) and a regenerative-braking switch. With regen off, Sanjeev's downhill-recovery term is set to 0. |
 | **Settings** | Choose the vehicle (re-calculates range, energy and routes) and reset the trip. |

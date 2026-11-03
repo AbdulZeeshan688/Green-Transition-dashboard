@@ -16,6 +16,34 @@ export function chargeStep(socPercent, limitPercent, powerKW, vehicle, hours) {
   return Math.min(limitPercent, socPercent + added);
 }
 
+// Power the car actually charges with on a given charger. Uses the vehicle's
+// verified charging specs (vehicles.json "charging") when available:
+// - wrong plug (e.g. CHAdeMO car on a CCS2 charger) → not compatible
+// - DC with a known 10–80 % time → average power over that window (real cars
+//   only reach their peak briefly, so this is more realistic than the peak)
+// - otherwise the lower of charger power and the car's max power
+// Without verified specs the charger's power is used and flagged.
+export function chargingPower(charger, vehicle) {
+  const spec = vehicle.charging?.[charger.type.toLowerCase()];
+  if (spec && spec.port !== charger.port) {
+    return {
+      compatible: false,
+      kw: 0,
+      note: `${vehicle.make} ${vehicle.model} uses ${spec.port}, not ${charger.port}`,
+    };
+  }
+  if (!spec) {
+    return { compatible: true, kw: charger.powerKW, note: 'car limit not verified' };
+  }
+  if (charger.type === 'DC' && spec.minutes10to80) {
+    const avgKW = (0.7 * vehicle.batteryCapacity) / (spec.minutes10to80 / 60);
+    const kw = Math.min(charger.powerKW, avgKW);
+    return { compatible: true, kw, note: `average 10–80 % (peak ${spec.maxKW} kW)` };
+  }
+  const kw = Math.min(charger.powerKW, spec.maxKW);
+  return { compatible: true, kw, note: spec.maxKW < charger.powerKW ? 'limited by the car' : 'limited by the charger' };
+}
+
 export function formatDuration(hours) {
   const totalMin = Math.round(hours * 60);
   const h = Math.floor(totalMin / 60);

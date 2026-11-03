@@ -131,7 +131,23 @@ describe('data files', () => {
   });
 
   it('charging settings are consistent', () => {
-    for (const key of ['chargerPowerKW', 'limitStepPercent', 'demoTimeScale']) {
+    const PORTS = { AC: ['Type 2'], DC: ['CCS2', 'CHAdeMO'] };
+    expect(unique(charging.chargers.map((c) => c.id))).toBe(true);
+    expect(charging.chargers.some((c) => c.id === charging.defaultChargerId)).toBe(true);
+    for (const c of charging.chargers) {
+      expect(PORTS[c.type], c.id).toContain(c.port);
+      expect(positive(c.powerKW), c.id).toBe(true);
+    }
+    for (const v of vehicles.filter((x) => x.charging)) {
+      expect(typeof v.charging.source, v.registrationNumber).toBe('string');
+      for (const type of ['AC', 'DC']) {
+        const spec = v.charging[type.toLowerCase()];
+        if (!spec) continue;
+        expect(PORTS[type], `${v.registrationNumber} ${type}`).toContain(spec.port);
+        expect(positive(spec.maxKW), `${v.registrationNumber} ${type}`).toBe(true);
+      }
+    }
+    for (const key of ['limitStepPercent', 'demoTimeScale']) {
       expect(positive(charging[key]), key).toBe(true);
     }
     expect(charging.limitMinPercent).toBeLessThan(charging.limitMaxPercent);

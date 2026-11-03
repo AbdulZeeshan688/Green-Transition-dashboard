@@ -10,7 +10,19 @@
     "maxSpeedKmh": 160,
     "image": "images/polestar-2.png",
     "imageSource": "Polestar (collaboration partner)",
-    "specSource": "ev-database.org (MY21-22, WLTP)"
+    "specSource": "ev-database.org (MY21-22, WLTP)",
+    "charging": {
+      "ac": {
+        "port": "Type 2",
+        "maxKW": 11
+      },
+      "dc": {
+        "port": "CCS2",
+        "maxKW": 149,
+        "minutes10to80": 34
+      },
+      "source": "ev-database.org (Polestar 2 LR Single Motor MY21-22)"
+    }
   },
   {
     "registrationNumber": "EV-001",
@@ -36,7 +48,18 @@
     "maxSpeedKmh": 160,
     "image": "images/vw-id3.png",
     "imageSource": "Volkswagen manufacturer image, supplied by the team",
-    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
+    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec",
+    "charging": {
+      "ac": {
+        "port": "Type 2",
+        "maxKW": 11
+      },
+      "dc": {
+        "port": "CCS2",
+        "maxKW": 120
+      },
+      "source": "ev-database.org / manufacturer data (ID.3 Pro 58 kWh)"
+    }
   },
   {
     "registrationNumber": "EV-003",
@@ -49,7 +72,14 @@
     "maxSpeedKmh": 185,
     "image": "images/hyundai-ioniq-5.png",
     "imageSource": "Hyundai manufacturer image, supplied by the team",
-    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
+    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec",
+    "charging": {
+      "dc": {
+        "port": "CCS2",
+        "maxKW": 233
+      },
+      "source": "EVBox / AEVA (IONIQ 5 77.4 kWh); AC limit not verified"
+    }
   },
   {
     "registrationNumber": "EV-004",
@@ -75,6 +105,13 @@
     "maxSpeedKmh": 144,
     "image": "images/nissan-leaf.png",
     "imageSource": "Nissan manufacturer image, supplied by the team",
-    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec"
+    "specSource": "Sanjeev's vehicles-temp.js; top speed manufacturer spec",
+    "charging": {
+      "dc": {
+        "port": "CHAdeMO",
+        "maxKW": 50
+      },
+      "source": "greencarscompare.com (Leaf 40 kWh); AC limit not verified"
+    }
   }
 ]
