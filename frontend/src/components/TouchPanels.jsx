@@ -1,5 +1,5 @@
 import Icon from './Icon';
-import { energyToLimitKWh, formatDuration, hoursToLimit } from '../lib/charging';
+import { chargingPower, energyToLimitKWh, formatDuration, hoursToLimit } from '../lib/charging';
 import { estimateRangeKm } from '../lib/energyModel';
 import { fmt } from '../lib/format';
 
@@ -35,17 +35,40 @@ export function ChargingPanel({
   onLimitChange,
   charging,
   onToggleCharging,
+  chargerId,
+  onChargerChange,
   onBack,
 }) {
-  const hours = hoursToLimit(socPercent, limit, config.chargerPowerKW, vehicle);
+  const charger = config.chargers.find((c) => c.id === chargerId) ?? config.chargers[0];
+  const power = chargingPower(charger, vehicle);
+  const hours = power.compatible ? hoursToLimit(socPercent, limit, power.kw, vehicle) : NaN;
   const reached = socPercent >= limit;
   return (
     <div className="panel">
       <PanelHeader
         title="Charging"
-        subtitle={`${config.chargerLabel} · ${fmt(config.chargerPowerKW)} kW`}
+        subtitle={`${charger.label} · ${charger.port} · ${fmt(charger.powerKW)} kW`}
         onBack={onBack}
       />
+
+      <div className="segmented">
+        {config.chargers.map((c) => (
+          <button
+            key={c.id}
+            className={c.id === charger.id ? 'active' : ''}
+            onClick={() => onChargerChange(c.id)}
+            disabled={charging}
+            title={charging ? 'Stop charging to change charger' : undefined}
+          >
+            {c.type} · {c.port} · {fmt(c.powerKW)} kW
+          </button>
+        ))}
+      </div>
+      {!power.compatible && (
+        <div className="status-banner warning">
+          <Icon name="bolt" size={20} /> {power.note} — this charger can't be used.
+        </div>
+      )}
 
       <div className="panel-card charge-card">
         <div className="charge-top">
@@ -72,6 +95,7 @@ export function ChargingPanel({
       </div>
 
       <div className="panel-card">
+        <Row label="Charging power" value={power.compatible ? `${fmt(power.kw)} kW · ${power.note}` : '—'} />
         <Row
           label="Energy to limit"
           value={`${fmt(energyToLimitKWh(socPercent, limit, vehicle), 1)} ${units.energy}`}
@@ -83,7 +107,7 @@ export function ChargingPanel({
       <button
         className={`btn ${charging ? 'secondary' : 'primary'}`}
         onClick={onToggleCharging}
-        disabled={!charging && reached}
+        disabled={!charging && (reached || !power.compatible)}
       >
         <Icon name="bolt" size={20} /> {charging ? 'Stop charging' : 'Start charging'}
       </button>

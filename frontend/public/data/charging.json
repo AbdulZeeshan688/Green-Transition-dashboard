@@ -1,10 +1,25 @@
 {
-  "chargerLabel": "AC wallbox",
-  "chargerPowerKW": 11,
+  "chargers": [
+    {
+      "id": "ac",
+      "label": "AC wallbox",
+      "type": "AC",
+      "port": "Type 2",
+      "powerKW": 11
+    },
+    {
+      "id": "dc",
+      "label": "DC fast charger",
+      "type": "DC",
+      "port": "CCS2",
+      "powerKW": 150
+    }
+  ],
+  "defaultChargerId": "ac",
   "limitMinPercent": 50,
   "limitMaxPercent": 100,
   "limitStepPercent": 5,
   "defaultLimitPercent": 90,
   "demoTimeScale": 120,
-  "note": "demoTimeScale only speeds up the on-screen demo; 'time to limit' is shown in real time (energy needed / charger power)."
+  "note": "Type 2 (AC) and CCS2 (DC) are the European standards. Power used = the lower of the charger and the car's verified limit (vehicles.json 'charging'). demoTimeScale only speeds up the on-screen demo; 'time to limit' is real time."
 }
