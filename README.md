@@ -4,6 +4,8 @@ A web dashboard for an **electric vehicle digital twin**. It shows the car's liv
 
 Built as a group project for **LAB REDI 2026 (task 3.4)**, part of the **Electric Mobility Digital Twin (EMDT)** project by LAB University of Applied Sciences and LUT University.
 
+**▶ Live demo: https://green-transition-rg.netlify.app** (runs in any browser, no installation needed)
+
 ![Dashboard](docs/screenshots/dashboard.png)
 
 ---
@@ -241,6 +243,8 @@ The full setup is in [`READMEfromOtherGroup.md`](READMEfromOtherGroup.md).
 - [x] Dashboard can use the backend for routes (Settings → Route data)
 - [x] Steering input ready for the CARLA team's wheel (Settings → Steering input)
 - [x] 69 automatic frontend tests
+- [x] Dashboard hosted online on Netlify (`netlify.toml`)
+- [x] Real routes from the backend tested locally with an OpenRouteService key
 - [ ] Agree on one energy model for frontend and backend
 - [ ] Connect the real CARLA steering wheel
 - [ ] Live electricity CO₂ data from Fingrid
