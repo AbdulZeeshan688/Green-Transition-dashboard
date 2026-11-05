@@ -89,7 +89,6 @@ export default function RouteEvaluation({
   const [origin, setOrigin] = useState(searchable ? null : places[0]);
   const [destination, setDestination] = useState(searchable ? null : places[1]);
   const [selectedId, setSelectedId] = useState(null);
-  const [scores, setScores] = useState(null);
   const [result, setResult] = useState({ status: 'idle', routes: [], source: null, error: null });
 
   useEffect(() => {
@@ -120,16 +119,14 @@ export default function RouteEvaluation({
   );
   const { fastestId, ecoId } = classifyRoutes(evaluated);
 
-  useEffect(() => {
-    setScores(null);
-    setSelectedId(candidates[0]?.id ?? null);
-  }, [candidates, vehicle.registrationNumber]);
+  // Scores are calculated as soon as routes arrive (and again for another vehicle).
+  const scores = useMemo(() => scoreRoutes(evaluated, scoring.metrics), [evaluated, scoring.metrics]);
+  const bestId = bestRouteId(scores);
 
-  const evaluate = () => {
-    const result = scoreRoutes(evaluated, scoring.metrics);
-    setScores(result);
-    setSelectedId(bestRouteId(result));
-  };
+  // New routes: start with the best-scoring one selected.
+  useEffect(() => {
+    setSelectedId(bestId ?? candidates[0]?.id ?? null);
+  }, [scores]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selected = candidates.find((r) => r.id === selectedId);
   const labelOf = (id) => routeLabel(id, ecoId, fastestId);
@@ -252,7 +249,7 @@ export default function RouteEvaluation({
         <div className="route-cards">
           {evaluated.map((r) => {
             const { label, icon } = labelOf(r.id);
-            const score = scores?.[r.id];
+            const score = scores[r.id];
             const good = score !== undefined && score >= scoring.goodScoreMin;
             const tone = score === undefined ? '' : good ? 'good' : 'warn';
             return (
@@ -324,8 +321,12 @@ export default function RouteEvaluation({
       )}
 
       <div className="route-actions">
-        <button className="btn secondary" onClick={evaluate} disabled={candidates.length === 0}>
-          <Icon name="refresh" size={20} /> Evaluate Route
+        <button
+          className="btn secondary"
+          onClick={() => setSelectedId(bestId)}
+          disabled={!bestId || selectedId === bestId}
+        >
+          <Icon name="refresh" size={20} /> {selectedId === bestId ? 'Best Route Selected' : 'Select Best Route'}
         </button>
         <button
           className="btn primary"
