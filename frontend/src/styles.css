@@ -1322,7 +1322,8 @@ select {
   aspect-ratio: 100 / 45;
 }
 
-.route-map svg {
+/* Only the schematic map's own SVG, not Leaflet's route layer. */
+.route-map > svg {
   display: block;
   width: 100%;
   height: 100%;
@@ -2120,4 +2121,109 @@ select {
 .volume-buttons {
   display: flex;
   gap: 10px;
+}
+
+/* ---------- Real street map (Leaflet) ---------- */
+.route-map.real {
+  aspect-ratio: auto;
+  height: 360px;
+}
+
+.real-map-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.route-map.real .map-legend {
+  left: auto;
+  right: 14px;
+  z-index: 500; /* above Leaflet's map panes */
+}
+
+.leaflet-container .real-route.selected {
+  stroke: var(--green);
+}
+
+.leaflet-container .real-route.alt {
+  stroke: #8f979c;
+  cursor: pointer;
+}
+
+.leaflet-container .real-start {
+  stroke: #fff;
+  stroke-width: 3;
+  fill: var(--green-light);
+  fill-opacity: 1;
+}
+
+.leaflet-container .real-end {
+  stroke: #fff;
+  stroke-width: 3;
+  fill: #1b2124;
+  fill-opacity: 1;
+}
+
+.leaflet-container {
+  font: inherit;
+}
+
+/* ---------- Route Evaluation: place search ---------- */
+.place-search {
+  position: relative;
+}
+
+.select-wrap input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 16px 0;
+  font-size: 17px;
+  color: var(--text);
+  outline: none;
+  min-width: 0;
+}
+
+.select-wrap:focus-within {
+  border-color: var(--green);
+}
+
+.place-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* above the Leaflet map */
+  margin: 4px 0 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 12%);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.place-results li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.place-results li.active {
+  background: var(--green-soft);
+}
+
+.place-results li small {
+  color: var(--muted);
+}
+
+.place-results li.place-note {
+  color: var(--muted);
+  cursor: default;
 }

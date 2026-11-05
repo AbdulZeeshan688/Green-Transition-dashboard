@@ -19,6 +19,7 @@ const charging = load('charging');
 const systemsCfg = load('vehicle-systems');
 const integrations = load('integrations');
 const cabinCfg = load('cabin');
+const mapCfg = load('map');
 
 const unique = (list) => new Set(list).size === list.length;
 const positive = (n) => typeof n === 'number' && n > 0;
@@ -156,7 +157,7 @@ describe('data files', () => {
     expect(charging.defaultLimitPercent).toBeLessThanOrEqual(charging.limitMaxPercent);
   });
 
-  it('integrations: default sources exist and backend places have coordinates', () => {
+  it('integrations: default sources exist and place search is configured', () => {
     for (const group of [integrations.driverInput, integrations.routes]) {
       expect(unique(group.sources.map((x) => x.id))).toBe(true);
       expect(
@@ -169,12 +170,21 @@ describe('data files', () => {
     for (const key of ['reconnectSeconds', 'staleMs', 'stateIntervalMs']) expect(positive(wheel[key]), key).toBe(true);
     const backend = integrations.routes.backend;
     expect(backend.path.startsWith('/')).toBe(true);
-    expect(backend.places.length).toBeGreaterThanOrEqual(2);
-    for (const p of backend.places) {
-      expect(p.coords, p.id).toHaveLength(2);
-      const [lon, lat] = p.coords;
-      expect(lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90, p.id).toBe(true);
-    }
+    const search = backend.placeSearch;
+    expect(search.url).toMatch(/^https:\/\//);
+    for (const key of ['limit', 'minChars', 'debounceMs']) expect(positive(search[key]), key).toBe(true);
+    const [lat, lon] = search.biasLatLon;
+    expect(lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90).toBe(true);
+  });
+
+  it('map settings are valid', () => {
+    expect(mapCfg.tileUrl).toMatch(/^https:\/\/.*\{z\}.*\{x\}.*\{y\}/);
+    expect(mapCfg.attribution).toMatch(/OpenStreetMap/);
+    expect(positive(mapCfg.maxZoom)).toBe(true);
+    expect(mapCfg.fitPaddingPx).toBeGreaterThanOrEqual(0);
+    const [lat, lon] = mapCfg.defaultCenter;
+    expect(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180).toBe(true);
+    for (const key of ['defaultZoom', 'placeZoom']) expect(positive(mapCfg[key]), key).toBe(true);
   });
 
   it('cabin settings are consistent', () => {

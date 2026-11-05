@@ -40,6 +40,7 @@ export default function Dashboard({ data }) {
     vehicleSystems,
     integrations,
     cabin: cabinCfg,
+    map: mapConfig,
   } = data;
 
   // The active tab is mirrored in the URL hash (#route, #vehicle) so views can be linked directly.
@@ -62,7 +63,10 @@ export default function Dashboard({ data }) {
   );
   // Where driver inputs and routes come from (switchable in Settings).
   const [inputSource, setInputSource] = useState(integrations.driverInput.defaultSource);
-  const [routeSource, setRouteSource] = useState(integrations.routes.defaultSource);
+  // VITE_ROUTE_SOURCE lets a deployment without the backend (e.g. Netlify) use the sample routes.
+  const [routeSource, setRouteSource] = useState(
+    import.meta.env.VITE_ROUTE_SOURCE ?? integrations.routes.defaultSource,
+  );
   const routeProvider = useMemo(
     () => createRouteProvider(routeSource, { routesData: routes, integrations }),
     [routeSource, routes, integrations],
@@ -445,7 +449,9 @@ export default function Dashboard({ data }) {
             <RouteEvaluation
               key={routeSource}
               provider={routeProvider}
+              placeSearch={integrations.routes.backend.placeSearch}
               sourceLabel={routeSourceLabel}
+              mapConfig={mapConfig}
               scoring={scoring}
               vehicle={vehicle}
               energyModel={activeModel}

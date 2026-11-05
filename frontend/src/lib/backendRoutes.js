@@ -43,6 +43,8 @@ export function mapBackendRoutes(response, originId, destinationId) {
       totalUphill: r.climb_m,
       totalDownhill: r.descent_m,
       path: paths[i],
+      // Real coordinates for the street map: backend gives [lon, lat], Leaflet wants [lat, lon].
+      latLngs: (r.coords ?? []).map(([lon, lat]) => [lat, lon]),
       // Kept for comparison with the backend's own physics-based estimate.
       backendEnergyKWh: r.e_total_kwh,
       backendCo2Kg: r.co2_kg,

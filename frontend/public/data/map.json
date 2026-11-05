@@ -1,0 +1,15 @@
+{
+  "description": "Street map used by Route Evaluation when routes have real coordinates (backend routes). Sample routes without coordinates use the schematic map.",
+  "tileUrl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+  "maxZoom": 19,
+  "fitPaddingPx": 30,
+  "defaultCenter": [
+    60.9827,
+    25.6612
+  ],
+  "defaultZoom": 9,
+  "placeZoom": 12,
+  "viewNote": "defaultCenter [lat, lon] = Lahti, shown before a start/destination is chosen; placeZoom is used when only one place is chosen.",
+  "source": "OpenStreetMap standard tiles (no key needed; attribution required; fine for light use such as a showroom demo, see the OSM tile usage policy)"
+}

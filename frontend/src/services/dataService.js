@@ -22,6 +22,7 @@ export async function loadAppData() {
     vehicleSystems,
     integrations,
     cabin,
+    map,
   ] = await Promise.all([
     getJson('ui'),
     getJson('vehicles'),
@@ -35,6 +36,7 @@ export async function loadAppData() {
     getJson('vehicle-systems'),
     getJson('integrations'),
     getJson('cabin'),
+    getJson('map'),
   ]);
   return {
     ui,
@@ -49,5 +51,6 @@ export async function loadAppData() {
     vehicleSystems,
     integrations,
     cabin,
+    map,
   };
 }

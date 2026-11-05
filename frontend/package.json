@@ -14,6 +14,7 @@
     "mock-wheel": "node tools/mock-wheel.mjs"
   },
   "dependencies": {
+    "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
