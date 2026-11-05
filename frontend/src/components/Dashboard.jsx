@@ -449,6 +449,7 @@ export default function Dashboard({ data }) {
             <RouteEvaluation
               key={routeSource}
               provider={routeProvider}
+              placeSearch={integrations.routes.backend.placeSearch}
               sourceLabel={routeSourceLabel}
               mapConfig={mapConfig}
               scoring={scoring}

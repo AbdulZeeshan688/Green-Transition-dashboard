@@ -36,40 +36,19 @@
       "baseUrl": "",
       "path": "/api/routes",
       "timeoutMs": 15000,
-      "places": [
-        {
-          "id": "lahti",
-          "name": "Lahti",
-          "coords": [
-            25.6612,
-            60.9827
-          ]
-        },
-        {
-          "id": "heinola",
-          "name": "Heinola",
-          "coords": [
-            26.038,
-            61.205
-          ]
-        },
-        {
-          "id": "helsinki",
-          "name": "Helsinki",
-          "coords": [
-            24.9384,
-            60.1699
-          ]
-        },
-        {
-          "id": "porvoo",
-          "name": "Porvoo",
-          "coords": [
-            25.6651,
-            60.3932
-          ]
-        }
-      ]
+      "placeSearch": {
+        "description": "Start/destination search boxes. Photon = OpenStreetMap place search, free and without a key (fair use).",
+        "url": "https://photon.komoot.io/api/",
+        "limit": 6,
+        "minChars": 2,
+        "debounceMs": 350,
+        "lang": "en",
+        "biasLatLon": [
+          60.9827,
+          25.6612
+        ],
+        "biasNote": "Results near Lahti come first; places elsewhere still work."
+      }
     }
   }
 }

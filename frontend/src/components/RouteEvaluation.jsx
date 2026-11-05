@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Icon from './Icon';
+import PlaceSearch from './PlaceSearch';
 import RealRouteMap from './RealRouteMap';
 import { bestRouteId, scoreRoutes } from '../lib/routeScoring';
 import { classifyRoutes, evaluateRoute } from '../lib/energyModel';
@@ -79,25 +80,38 @@ export default function RouteEvaluation({
   onApply,
   onClose,
   mapConfig,
+  placeSearch,
 }) {
   const { places } = provider;
-  const [originId, setOriginId] = useState(places[0]?.id);
-  const [destinationId, setDestinationId] = useState(places[1]?.id);
+  // With a searchable provider (backend) the user types any place; otherwise
+  // they pick from the provider's fixed list (sample data).
+  const searchable = Boolean(provider.searchPlaces);
+  const [origin, setOrigin] = useState(searchable ? null : places[0]);
+  const [destination, setDestination] = useState(searchable ? null : places[1]);
   const [selectedId, setSelectedId] = useState(null);
   const [scores, setScores] = useState(null);
-  const [result, setResult] = useState({ status: 'loading', routes: [], source: null, error: null });
+  const [result, setResult] = useState({ status: 'idle', routes: [], source: null, error: null });
 
   useEffect(() => {
+    if (!origin || !destination) {
+      setResult({ status: 'idle', routes: [], source: null, error: null });
+      return undefined;
+    }
     let cancelled = false;
     setResult((r) => ({ ...r, status: 'loading', error: null }));
     provider
-      .getRoutes(originId, destinationId)
+      .getRoutes(origin, destination)
       .then(({ routes, source }) => !cancelled && setResult({ status: 'ready', routes, source, error: null }))
       .catch((error) => !cancelled && setResult({ status: 'error', routes: [], source: null, error: error.message }));
     return () => {
       cancelled = true;
     };
-  }, [provider, originId, destinationId]);
+  }, [provider, origin, destination]);
+
+  const toLatLng = (place) => (place?.coords ? [place.coords[1], place.coords[0]] : null);
+  const startLatLng = useMemo(() => toLatLng(origin), [origin]);
+  const endLatLng = useMemo(() => toLatLng(destination), [destination]);
+  const placeById = (id) => places.find((p) => p.id === id);
 
   const candidates = result.routes;
   const evaluated = useMemo(
@@ -119,7 +133,6 @@ export default function RouteEvaluation({
 
   const selected = candidates.find((r) => r.id === selectedId);
   const labelOf = (id) => routeLabel(id, ecoId, fastestId);
-  const placeName = (id) => places.find((p) => p.id === id)?.name;
 
   return (
     <section className="route-panel">
@@ -134,50 +147,77 @@ export default function RouteEvaluation({
       </div>
 
       <div className="route-inputs">
-        <label>
-          Start
-          <span className="select-wrap">
-            <Icon name="pin" size={18} className="accent" />
-            <select value={originId} onChange={(e) => setOriginId(e.target.value)}>
-              {places.map((p) => (
-                <option key={p.id} value={p.id} disabled={p.id === destinationId}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </span>
-        </label>
+        {searchable ? (
+          <PlaceSearch
+            label="Start"
+            icon="pin"
+            iconClass="accent"
+            value={origin}
+            onChange={setOrigin}
+            search={provider.searchPlaces}
+            minChars={placeSearch.minChars}
+            debounceMs={placeSearch.debounceMs}
+          />
+        ) : (
+          <label>
+            Start
+            <span className="select-wrap">
+              <Icon name="pin" size={18} className="accent" />
+              <select value={origin?.id} onChange={(e) => setOrigin(placeById(e.target.value))}>
+                {places.map((p) => (
+                  <option key={p.id} value={p.id} disabled={p.id === destination?.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </span>
+          </label>
+        )}
         <button
           className="icon-btn swap"
           aria-label="Swap start and destination"
           onClick={() => {
-            setOriginId(destinationId);
-            setDestinationId(originId);
+            setOrigin(destination);
+            setDestination(origin);
           }}
         >
           <Icon name="swap" size={22} />
         </button>
-        <label>
-          Destination
-          <span className="select-wrap">
-            <Icon name="flag" size={18} />
-            <select value={destinationId} onChange={(e) => setDestinationId(e.target.value)}>
-              {places.map((p) => (
-                <option key={p.id} value={p.id} disabled={p.id === originId}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </span>
-        </label>
+        {searchable ? (
+          <PlaceSearch
+            label="Destination"
+            icon="flag"
+            value={destination}
+            onChange={setDestination}
+            search={provider.searchPlaces}
+            minChars={placeSearch.minChars}
+            debounceMs={placeSearch.debounceMs}
+          />
+        ) : (
+          <label>
+            Destination
+            <span className="select-wrap">
+              <Icon name="flag" size={18} />
+              <select value={destination?.id} onChange={(e) => setDestination(placeById(e.target.value))}>
+                {places.map((p) => (
+                  <option key={p.id} value={p.id} disabled={p.id === origin?.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </span>
+          </label>
+        )}
       </div>
 
-      {candidates.some((r) => r.latLngs?.length > 1) ? (
+      {searchable || candidates.some((r) => r.latLngs?.length > 1) ? (
         <RealRouteMap
           routes={evaluated.map((r) => ({ ...r, label: labelOf(r.id).label }))}
           selectedId={selectedId}
           onSelect={setSelectedId}
           config={mapConfig}
+          start={startLatLng}
+          end={endLatLng}
         />
       ) : (
         <RouteMap candidates={candidates} selectedId={selectedId} />
@@ -193,7 +233,13 @@ export default function RouteEvaluation({
         {result.source && result.source !== 'sample' && ` (${result.source})`}
       </p>
 
-      {result.status === 'loading' ? (
+      {result.status === 'idle' ? (
+        <p className="empty">
+          {origin
+            ? 'Now search for a destination.'
+            : 'Search for a start and a destination to see the real routes between them.'}
+        </p>
+      ) : result.status === 'loading' ? (
         <p className="empty">Loading routes…</p>
       ) : result.status === 'error' ? (
         <p className="empty error-text">
@@ -284,7 +330,7 @@ export default function RouteEvaluation({
         <button
           className="btn primary"
           disabled={!selected}
-          onClick={() => onApply({ ...selected, destinationName: placeName(destinationId) })}
+          onClick={() => onApply({ ...selected, destinationName: destination?.name })}
         >
           <Icon name={appliedRouteId === selectedId ? 'check' : 'arrowRight'} size={20} />
           {appliedRouteId === selectedId ? 'Route Applied' : 'Apply Route'}

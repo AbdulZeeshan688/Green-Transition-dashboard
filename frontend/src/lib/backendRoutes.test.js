@@ -97,18 +97,18 @@ describe('route providers', () => {
         baseUrl: '',
         path: '/api/routes',
         timeoutMs: 1000,
-        places: [
-          { id: 'lahti', name: 'Lahti', coords: [25.66, 60.98] },
-          { id: 'heinola', name: 'Heinola', coords: [26.04, 61.2] },
-        ],
+        placeSearch: { url: 'https://photon.test/api/', limit: 5, minChars: 2, debounceMs: 1, lang: 'en' },
       },
     },
   };
 
+  const lahti = { id: 'lahti', name: 'Lahti', coords: [25.66, 60.98] };
+  const heinola = { id: 'heinola', name: 'Heinola', coords: [26.04, 61.2] };
+
   it('local provider reads routes.json', async () => {
     const provider = createRouteProvider('local', { routesData, integrations });
     expect(provider.places).toBe(routesData.places);
-    const { routes, source } = await provider.getRoutes('a', 'b');
+    const { routes, source } = await provider.getRoutes({ id: 'a' }, { id: 'b' });
     expect(source).toBe('sample');
     expect(routes.map((r) => r.id)).toEqual(['r']);
   });
@@ -116,7 +116,7 @@ describe('route providers', () => {
   it('backend provider POSTs coordinates and maps the answer', async () => {
     const fetchImpl = vi.fn(async () => ({ ok: true, json: async () => backendResponse }));
     const provider = createRouteProvider('backend', { routesData, integrations, fetchImpl });
-    const { routes } = await provider.getRoutes('lahti', 'heinola');
+    const { routes } = await provider.getRoutes(lahti, heinola);
     const [url, options] = fetchImpl.mock.calls[0];
     expect(url).toBe('/api/routes');
     expect(JSON.parse(options.body)).toEqual({ start: [25.66, 60.98], end: [26.04, 61.2] });
@@ -126,6 +126,14 @@ describe('route providers', () => {
   it('backend provider reports HTTP errors', async () => {
     const fetchImpl = vi.fn(async () => ({ ok: false, status: 500 }));
     const provider = createRouteProvider('backend', { routesData, integrations, fetchImpl });
-    await expect(provider.getRoutes('lahti', 'heinola')).rejects.toThrow('HTTP 500');
+    await expect(provider.getRoutes(lahti, heinola)).rejects.toThrow('HTTP 500');
+  });
+
+  it('backend provider searches places with the configured service', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, json: async () => ({ features: [] }) }));
+    const provider = createRouteProvider('backend', { routesData, integrations, fetchImpl });
+    expect(provider.places).toEqual([]);
+    await provider.searchPlaces('Lahti');
+    expect(fetchImpl.mock.calls[0][0]).toBe('https://photon.test/api/?q=Lahti&limit=5&lang=en');
   });
 });

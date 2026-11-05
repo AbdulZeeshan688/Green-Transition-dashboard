@@ -2167,3 +2167,63 @@ select {
 .leaflet-container {
   font: inherit;
 }
+
+/* ---------- Route Evaluation: place search ---------- */
+.place-search {
+  position: relative;
+}
+
+.select-wrap input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 16px 0;
+  font-size: 17px;
+  color: var(--text);
+  outline: none;
+  min-width: 0;
+}
+
+.select-wrap:focus-within {
+  border-color: var(--green);
+}
+
+.place-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* above the Leaflet map */
+  margin: 4px 0 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 12%);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.place-results li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.place-results li.active {
+  background: var(--green-soft);
+}
+
+.place-results li small {
+  color: var(--muted);
+}
+
+.place-results li.place-note {
+  color: var(--muted);
+  cursor: default;
+}
