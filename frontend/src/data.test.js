@@ -19,6 +19,7 @@ const charging = load('charging');
 const systemsCfg = load('vehicle-systems');
 const integrations = load('integrations');
 const cabinCfg = load('cabin');
+const mapCfg = load('map');
 
 const unique = (list) => new Set(list).size === list.length;
 const positive = (n) => typeof n === 'number' && n > 0;
@@ -175,6 +176,13 @@ describe('data files', () => {
       const [lon, lat] = p.coords;
       expect(lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90, p.id).toBe(true);
     }
+  });
+
+  it('map settings are valid', () => {
+    expect(mapCfg.tileUrl).toMatch(/^https:\/\/.*\{z\}.*\{x\}.*\{y\}/);
+    expect(mapCfg.attribution).toMatch(/OpenStreetMap/);
+    expect(positive(mapCfg.maxZoom)).toBe(true);
+    expect(mapCfg.fitPaddingPx).toBeGreaterThanOrEqual(0);
   });
 
   it('cabin settings are consistent', () => {

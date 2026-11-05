@@ -3,8 +3,14 @@
   "driverInput": {
     "defaultSource": "local",
     "sources": [
-      { "id": "local", "label": "Keyboard & touch" },
-      { "id": "wheel", "label": "External steering wheel (CARLA team)" }
+      {
+        "id": "local",
+        "label": "Keyboard & touch"
+      },
+      {
+        "id": "wheel",
+        "label": "External steering wheel (CARLA team)"
+      }
     ],
     "wheel": {
       "transport": "websocket",
@@ -15,20 +21,54 @@
     }
   },
   "routes": {
-    "defaultSource": "local",
+    "defaultSource": "backend",
     "sources": [
-      { "id": "local", "label": "Sample routes (routes.json)" },
-      { "id": "backend", "label": "Backend API (Tao)" }
+      {
+        "id": "local",
+        "label": "Sample routes (routes.json)"
+      },
+      {
+        "id": "backend",
+        "label": "Backend API (Tao)"
+      }
     ],
     "backend": {
       "baseUrl": "",
       "path": "/api/routes",
       "timeoutMs": 15000,
       "places": [
-        { "id": "lahti", "name": "Lahti", "coords": [25.6612, 60.9827] },
-        { "id": "heinola", "name": "Heinola", "coords": [26.038, 61.205] },
-        { "id": "helsinki", "name": "Helsinki", "coords": [24.9384, 60.1699] },
-        { "id": "porvoo", "name": "Porvoo", "coords": [25.6651, 60.3932] }
+        {
+          "id": "lahti",
+          "name": "Lahti",
+          "coords": [
+            25.6612,
+            60.9827
+          ]
+        },
+        {
+          "id": "heinola",
+          "name": "Heinola",
+          "coords": [
+            26.038,
+            61.205
+          ]
+        },
+        {
+          "id": "helsinki",
+          "name": "Helsinki",
+          "coords": [
+            24.9384,
+            60.1699
+          ]
+        },
+        {
+          "id": "porvoo",
+          "name": "Porvoo",
+          "coords": [
+            25.6651,
+            60.3932
+          ]
+        }
       ]
     }
   }

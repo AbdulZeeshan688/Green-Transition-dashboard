@@ -45,6 +45,11 @@ describe('mapBackendRoutes', () => {
       backendEnergyKWh: 6.09,
     });
     expect(routes[0].path).toHaveLength(2);
+    // street map needs [lat, lon]; the backend sends [lon, lat, elevation]
+    expect(routes[0].latLngs).toEqual([
+      [60.98, 25.66],
+      [61.2, 26.04],
+    ]);
   });
 
   it('projects coordinates into the 100 x 60 map with north up', () => {
@@ -66,8 +71,25 @@ describe('mapBackendRoutes', () => {
 
 describe('route providers', () => {
   const routesData = {
-    places: [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }],
-    routes: [{ id: 'r', originId: 'a', destinationId: 'b', distanceKm: 1, durationMin: 1, totalUphill: 0, totalDownhill: 0, path: [[0, 0], [1, 1]] }],
+    places: [
+      { id: 'a', name: 'A' },
+      { id: 'b', name: 'B' },
+    ],
+    routes: [
+      {
+        id: 'r',
+        originId: 'a',
+        destinationId: 'b',
+        distanceKm: 1,
+        durationMin: 1,
+        totalUphill: 0,
+        totalDownhill: 0,
+        path: [
+          [0, 0],
+          [1, 1],
+        ],
+      },
+    ],
   };
   const integrations = {
     routes: {

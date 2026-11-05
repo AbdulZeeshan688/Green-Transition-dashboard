@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Icon from './Icon';
+import RealRouteMap from './RealRouteMap';
 import { bestRouteId, scoreRoutes } from '../lib/routeScoring';
 import { classifyRoutes, evaluateRoute } from '../lib/energyModel';
 import { fmt } from '../lib/format';
@@ -77,6 +78,7 @@ export default function RouteEvaluation({
   appliedRouteId,
   onApply,
   onClose,
+  mapConfig,
 }) {
   const { places } = provider;
   const [originId, setOriginId] = useState(places[0]?.id);
@@ -170,7 +172,16 @@ export default function RouteEvaluation({
         </label>
       </div>
 
-      <RouteMap candidates={candidates} selectedId={selectedId} />
+      {candidates.some((r) => r.latLngs?.length > 1) ? (
+        <RealRouteMap
+          routes={evaluated.map((r) => ({ ...r, label: labelOf(r.id).label }))}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          config={mapConfig}
+        />
+      ) : (
+        <RouteMap candidates={candidates} selectedId={selectedId} />
+      )}
 
       <p className="route-context">
         Calculated for{' '}

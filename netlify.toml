@@ -7,6 +7,9 @@
 [build.environment]
   # Vite needs Node 22.12 or newer.
   NODE_VERSION = "22"
+  # No backend is hosted yet, so the online demo uses the sample routes.
+  # Remove this line once the backend is online.
+  VITE_ROUTE_SOURCE = "local"
 
 # Data files can be edited without a rebuild of the code; never cache them.
 [[headers]]
