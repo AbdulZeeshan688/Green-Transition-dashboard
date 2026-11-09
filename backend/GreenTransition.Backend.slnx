@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="GreenTransition.Backend.Tests/GreenTransition.Backend.Tests.csproj" />
+  <Project Path="GreenTransition.Backend/GreenTransition.Backend.csproj" />
+</Solution>
