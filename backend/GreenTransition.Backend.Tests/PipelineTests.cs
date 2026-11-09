@@ -15,6 +15,13 @@ public class PipelineTests
         Assert.Equal(result.Routes.MinBy(r => r.ETotalKwh)!.Id, result.BestId);
     }
 
+    [Fact]
+    public void ConfigLoadsEveryVehicleValue()
+    {
+        var vehicle = Inputs.Config.App.Vehicle;
+        Assert.Equal(new Inputs.VehicleConfig("Polestar 2 Long Range Single Motor", 2070, 17.1, 0.85, 0.65), vehicle);
+    }
+
     // The dashboard reads these exact names (frontend/src/lib/backendRoutes.js).
     [Fact]
     public async Task ResponseKeepsSnakeCaseFieldNames()

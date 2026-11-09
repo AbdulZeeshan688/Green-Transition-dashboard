@@ -1,10 +1,16 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GreenTransition.Backend.Inputs;
 
 public record RouteConfig(double[] DefaultStart, double[] DefaultEnd, int Alternatives, bool UseDemoData);
 
-public record VehicleConfig(string Name, double MassKg, double ConsumptionKwh100Km, double DriveEfficiency, double RegenEfficiency);
+public record VehicleConfig(
+    string Name,
+    double MassKg,
+    [property: JsonPropertyName("consumption_kwh_100km")] double ConsumptionKwh100Km,
+    double DriveEfficiency,
+    double RegenEfficiency);
 
 public record GridConfig(double CarbonGPerKwh);
 
