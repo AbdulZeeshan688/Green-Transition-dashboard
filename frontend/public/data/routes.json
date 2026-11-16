@@ -2,8 +2,8 @@
   "source": "SAMPLE route candidates in the shape the routing service (OpenRouteService in Sanjeev's backend) returns: distance, duration, total uphill/downhill. Energy, battery use and CO2 are calculated in the app with Sanjeev's model for the selected vehicle.",
   "places": [
     {
-      "id": "polystar-university",
-      "name": "Polystar University"
+      "id": "polestar-university",
+      "name": "Polestar University"
     },
     {
       "id": "green-city-center",
@@ -17,7 +17,7 @@
   "routes": [
     {
       "id": "uni-city-a",
-      "originId": "polystar-university",
+      "originId": "polestar-university",
       "destinationId": "green-city-center",
       "distanceKm": 15.2,
       "durationMin": 26,
@@ -68,7 +68,7 @@
     },
     {
       "id": "uni-city-b",
-      "originId": "polystar-university",
+      "originId": "polestar-university",
       "destinationId": "green-city-center",
       "distanceKm": 19.6,
       "durationMin": 18,
@@ -119,7 +119,7 @@
     },
     {
       "id": "uni-city-c",
-      "originId": "polystar-university",
+      "originId": "polestar-university",
       "destinationId": "green-city-center",
       "distanceKm": 17.1,
       "durationMin": 22,
