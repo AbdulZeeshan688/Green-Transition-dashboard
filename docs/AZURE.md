@@ -23,10 +23,7 @@ You only need to create the Static Web App once and connect it to GitHub with a 
 
 ## Step 1: Get access (once)
 
-The app goes into the **team's resource group** in Mira's Azure account. Ask Mira to give you the **Contributor** role on that resource group:
-*Resource group → Access control (IAM) → Add role assignment → Contributor → your account.*
-
-(Or Mira does Step 2 and sends you the token from Step 3.)
+You get a login to the team's Azure account (from the LAB team / security team). Check that your account has the **Contributor** role on the **team's resource group**: open the resource group → **Access control (IAM)** → **View my access**. Without Contributor you can't create the Static Web App.
 
 ## Step 2: Create the Static Web App (once)
 
@@ -36,11 +33,11 @@ The app goes into the **team's resource group** in Mira's Azure account. Ask Mir
 
    | Field | Value |
    |---|---|
-   | Subscription | Mira's subscription |
+   | Subscription | the team's subscription |
    | Resource group | the team's resource group |
    | Name | `green-transition-dashboard` |
    | Plan type | **Free** |
-   | Region | **West Europe** (if Azure refuses the region, ask Mira which regions the subscription allows) |
+   | Region | **West Europe** (if Azure refuses the region, ask the security team which regions are allowed) |
    | Deployment source | **Other** (not GitHub, our workflow file does the deploying) |
 
 4. **Review + create** → **Create**. It takes about a minute.
@@ -82,6 +79,6 @@ Until then, the online dashboard shows the **sample routes**. When the C# Azure 
 | Problem | Fix |
 |---|---|
 | Workflow says *"Not deployed. Add the AZURE_STATIC_WEB_APPS_API_TOKEN secret"* | Do Step 3, then run the workflow again. |
-| Azure: *"The location is not allowed"* or a policy error | The subscription limits regions. Ask Mira which region to use. |
+| Azure: *"The location is not allowed"* or a policy error | The subscription limits regions. Ask the security team which region to use. |
 | Workflow fails at **Test** | A test is broken on `main`. Run `npm test` in `frontend/` to see which one. |
 | Route page online: *"Could not get routes"* | Check that `BACKEND_URL` is right and the dashboard's address is in the Function App's CORS list. |
