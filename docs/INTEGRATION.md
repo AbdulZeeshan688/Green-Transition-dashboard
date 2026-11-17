@@ -68,14 +68,14 @@ POST /api/routes
 { "start": [25.6612, 60.9827], "end": [26.038, 61.205] }      // [longitude, latitude]
 ```
 
-It uses these fields from the response (`backend/app/schemas.py`, `RoutesResponse`):
+It uses these fields from the response (`backend/GreenTransition.Backend/Schemas.cs`, `RoutesResponse`, sent in snake_case):
 
 | Backend field | Dashboard field |
 |---|---|
 | `routes[].distance_m` | `distanceKm` (÷ 1000) |
 | `routes[].duration_s` | `durationMin` (÷ 60) |
 | `routes[].climb_m` / `descent_m` | `totalUphill` / `totalDownhill` |
-| `routes[].coords` (`[lon, lat, elev]`) | `path`, drawn on the route map |
+| `routes[].coords` (`[lon, lat, elev]`) | `latLngs`, drawn on the street map |
 | `routes[].e_total_kwh` | shown as **Backend estimate** for comparison |
 | `data_source` | shown next to the source (`ors` or `demo`) |
 
@@ -83,15 +83,15 @@ It uses these fields from the response (`backend/app/schemas.py`, `RoutesRespons
 
 ### Running both together
 ```bash
-# terminal 1 — backend (see backend/README.md)
-cd backend && .venv/bin/python -m uvicorn app.main:app --port 8000
+# terminal 1 — backend, C# Azure Function (see backend/README.md)
+cd backend/GreenTransition.Backend && func start
 # terminal 2 — dashboard
 cd frontend && npm run dev
 ```
-Then open **Settings → Route data → Backend API (Tao)** and the **Route Evaluation** tab.
+Then open the **Route Evaluation** tab. The backend is the default route source (`routes.defaultSource` in `integrations.json`).
 
 - In development, Vite forwards `/api` to `http://localhost:8000` (`frontend/vite.config.js`), so the backend needs **no CORS setup**. For another address: `BACKEND_URL=http://host:port npm run dev`.
-- The start and destination choices come from `routes.backend.places` in `integrations.json`. They match the `[cities]` in `backend/config.toml`. Add a city in both places.
+- Start and destination are search boxes. Places come from Photon (OpenStreetMap search, no key), set in `routes.backend.placeSearch` in `integrations.json`. The chosen `[longitude, latitude]` is sent to the backend.
 - If the backend is not running, Route Evaluation shows a clear error instead of fake data.
 
 ### Open decision: one energy model

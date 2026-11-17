@@ -23,12 +23,12 @@ Built as a group project for **LAB REDI 2026 (task 3.4)**, part of the **Electri
 
 - **Drive the car.** Press **START**, then accelerate, brake and steer with the keyboard, mouse or touch. Speed, battery and energy update live.
 - **Energy and CO₂.** Energy use, battery drain, range and CO₂ are calculated with the team's energy model.
-- **Route evaluation.** Compare routes, see which is the **Eco** and which the **Fastest** route, and apply one to the driver display.
+- **Real routes on a real map.** Type any start and destination (for example *LUT Lahti* → *Tampere*). The backend finds the real roads, and the dashboard draws them on an OpenStreetMap map with energy use, battery, CO₂ and a score for each route. The best route is selected automatically, and you can apply it to the driver display.
 - **Charging.** Set a charge limit and charge the battery.
 - **Safety.** See the status of Motor, Controller, CAN bus, ABS and ESC. A fault stops the car from driving.
 - **Six vehicles.** Polestar 2, Tesla Model 3, VW ID.3, Hyundai IONIQ 5, Kia EV6 and Nissan Leaf. Switching car recalculates everything.
 - **Every button works like a real car.** Climate (two zones, fan, A/C, defrost, seat and wheel heating), lights (headlights, fog, hazard, ambient colour), doors and openings, turn signals, phone (demo) and volume. Warning lights appear on the driver display.
-- **Ready for the other teams.** A real steering wheel (CARLA team) and Tao's routes backend can be switched on in **Settings**. See [docs/INTEGRATION.md](docs/INTEGRATION.md).
+- **Ready for the other teams.** A real steering wheel (CARLA team) can be switched on in **Settings**. See [docs/INTEGRATION.md](docs/INTEGRATION.md).
 
 | Route Evaluation | Charging |
 |---|---|
@@ -75,41 +75,60 @@ Open **<http://localhost:5173>** in your browser (Chrome, Edge, Firefox or Safar
 
 To stop the app, press **Ctrl + C** in the terminal.
 
-> No API keys, accounts or database are needed. The dashboard runs straight away.
+> The dashboard opens without the backend, but the **Route** page then shows an error. Start the backend too (next section) to search real routes. If you only want the sample routes, choose **Settings → Route data → Sample routes**.
 
 ---
 
-## Running the backend (optional)
+## Running the backend (for real routes)
 
-The `backend/` folder is a **Python (FastAPI)** service. It finds real routes between Finnish cities with **OpenRouteService** and calculates energy and CO₂ for each route. The dashboard doesn't use it yet (see *Status*), so you only need it to try the API.
+The `backend/` folder is a **C# Azure Function** (.NET 10). The LAB team asked us to use C#, so it replaced the earlier Python version. It finds real routes with **OpenRouteService** and calculates energy and CO₂ for each route. The dashboard uses it on the **Route** page.
 
-**Extra tool needed:** **Python 3.12 or newer**, from <https://www.python.org>.
+### Step 1: Install the tools (only once)
 
-From the project folder:
+1. **.NET 10 SDK** from <https://dotnet.microsoft.com/download/dotnet/10.0>. Take version **10**, not 11, because the project is built for .NET 10.
+2. **Azure Functions Core Tools v4** from <https://learn.microsoft.com/azure/azure-functions/functions-run-local>.
 
-**macOS / Linux**
+On a Mac with Homebrew, these commands do the same:
 ```bash
-cd backend
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+brew install --cask dotnet-sdk@10
+brew tap azure/functions
+brew trust azure/functions
+brew install azure-functions-core-tools@4
 ```
 
-**Windows (PowerShell)**
-```powershell
-cd backend
-python -m venv .venv
-.venv\Scripts\pip install -r requirements.txt
-.venv\Scripts\python -m uvicorn app.main:app --reload --port 8000
+Open a **new** terminal afterwards and check:
+```bash
+dotnet --version   # should start with 10
+func --version     # should start with 4
 ```
 
-Open **<http://localhost:8000/docs>** to try the API, for example `GET /api/routes/by-city` with `Lahti` → `Heinola`.
+### Step 2: Add the API key (only once)
 
-- **No API key?** It still works: it uses the demo routes in `backend/data/demo_routes.json`.
-- **Real routes:** copy `backend/.env.example` to `backend/.env` and add your free OpenRouteService key (`ORS_API_KEY=...`) from <https://openrouteservice.org>.
-- **Tests:** `.venv/bin/python -m pytest` (Windows: `.venv\Scripts\python -m pytest`).
+Copy `backend/GreenTransition.Backend/local.settings.example.json` to `local.settings.json` in the same folder, and put your free OpenRouteService key (from <https://openrouteservice.org>) in `ORS_API_KEY`. This file is git-ignored, so the key never goes to GitHub.
 
-More details are in [`backend/README.md`](backend/README.md).
+No key? It still works with the demo routes in `backend/GreenTransition.Backend/data/demo_routes.json`.
+
+### Step 3: Start it
+
+```bash
+cd backend/GreenTransition.Backend
+func start
+```
+The first start takes a minute or two. It's ready when you see `routes: [POST] http://localhost:8000/api/routes`.
+
+### Run everything together
+
+Use **two terminals** (in VS Code, the **+** in the terminal panel):
+
+| Terminal 1: backend | Terminal 2: dashboard |
+|---|---|
+| `cd backend/GreenTransition.Backend` | `cd frontend` |
+| `func start` | `npm run dev` |
+
+Then open **<http://localhost:5173/#route>**, search for a start and a destination, and the real routes appear on the map.
+
+- **Backend tests:** `cd backend` and then `dotnet test`.
+- More details are in [`backend/README.md`](backend/README.md).
 
 ---
 
@@ -155,15 +174,16 @@ Nothing is hardcoded. Every value comes from a file in **`frontend/public/data/`
 |---|---|
 | `vehicles.json` | Cars: battery size, energy consumption, top speed, photo |
 | `vehicle-state.json` | Starting battery %, gear, drive mode, car on or off |
-| `routes.json` | Places and routes (distance, time, uphill, downhill) |
+| `routes.json` | Sample places and routes, used only when the backend is switched off in Settings |
 | `energy-model.json` | Energy factors and the electricity CO₂ value |
 | `charging.json` | Charger power and charge-limit range |
 | `drive-modes.json` | Eco / Normal / Sport behaviour |
 | `scoring.json` | How routes are scored |
+| `map.json` | Street map tiles, start position and zoom of the route map |
 | `vehicle-systems.json` | Safety systems and demo scenarios |
 | `simulation.json` | Pedal speed, steering speed, animation speed |
 | `cabin.json` | Climate, lights, doors, audio and phone settings |
-| `integrations.json` | Steering wheel and backend addresses, default sources |
+| `integrations.json` | Steering wheel and backend addresses, place search, default sources |
 | `ui.json` | Tabs, touchscreen tiles and units |
 
 After editing, run `npm test`. It checks all data files and tells you if something is wrong.
@@ -195,13 +215,15 @@ Green-Transition-dashboard/
 │   ├── public/data/   ← All data files (JSON)
 │   ├── public/images/ ← Vehicle photos
 │   └── src/           ← React code: components, formulas, tests
-├── backend/           ← Python API: real routes (OpenRouteService), energy and CO₂
+├── backend/           ← C# Azure Function: real routes (OpenRouteService), energy and CO₂
+│   ├── GreenTransition.Backend/        ← the API
+│   └── GreenTransition.Backend.Tests/  ← its tests
 ├── docs/screenshots/  ← Pictures used in this README
 ├── Documents/         ← Reports, project plan and timesheets
 └── src/, index.html, package.json …  ← Earlier prototype by Unubold Luvsandagva (see below)
 ```
 
-**Built with:** JavaScript, React 18, Vite, Vitest, HTML and CSS (frontend) · Python, FastAPI, pytest (backend).
+**Built with:** JavaScript, React 18, Vite, Vitest, Leaflet and OpenStreetMap, HTML and CSS (frontend) · C#, .NET 10, Azure Functions, xUnit (backend).
 
 ---
 
@@ -230,6 +252,10 @@ The full setup is in [`READMEfromOtherGroup.md`](READMEfromOtherGroup.md).
 | Blank page / "Could not load dashboard data" | Don't open `index.html` by double-clicking. Always start with `npm run dev` and open the address it shows. |
 | The car won't move | Press **START** first, then shift to **D**. Check that Safety is not set to **Fault**. |
 | `frontend` folder not found | Make sure you have the latest `main`: run `git checkout main` and then `git pull`. |
+| `func: command not found` | Install Azure Functions Core Tools (backend Step 1) and open a **new** terminal. |
+| `func start` complains about the .NET version | You have .NET 11 instead of 10. Install the .NET **10** SDK (on a Mac: `brew uninstall --cask dotnet-sdk`, then `brew install --cask dotnet-sdk@10`). |
+| Route page: "Could not get routes" | The backend is not running. Start it with `func start` (see *Running the backend*). |
+| No suggestions when typing a place | The place search needs an internet connection. |
 
 ---
 
@@ -239,15 +265,17 @@ The full setup is in [`READMEfromOtherGroup.md`](READMEfromOtherGroup.md).
 - [x] Energy, battery, range and CO₂ with the team energy model
 - [x] Route evaluation (Eco / Fastest), charging, safety and vehicle selection
 - [x] All touchscreen and bottom-bar buttons working (climate, lights, doors, phone, audio)
-- [x] Backend API: real routes from OpenRouteService with energy and CO₂ per route (9 tests)
-- [x] Dashboard can use the backend for routes (Settings → Route data)
+- [x] Backend API in C# (Azure Function): real routes from OpenRouteService with energy and CO₂ per route (12 tests)
+- [x] Dashboard uses the backend for routes by default
+- [x] Real map (Leaflet / OpenStreetMap) and search for any start and destination
+- [x] Route scores shown straight away, best route pre-selected
 - [x] Steering input ready for the CARLA team's wheel (Settings → Steering input)
-- [x] 69 automatic frontend tests
+- [x] 79 automatic frontend tests
 - [x] Dashboard hosted online on Netlify (`netlify.toml`)
 - [x] Real routes from the backend tested locally with an OpenRouteService key
 - [ ] Agree on one energy model for frontend and backend
 - [ ] Connect the real CARLA steering wheel
 - [ ] Live electricity CO₂ data from Fingrid
-- [ ] Real map (Leaflet / OpenStreetMap)
+- [ ] Host the backend on Azure, so the online demo can show real routes too
 
-By default the dashboard uses its **sample data** (routes, starting battery level, safety scenarios), so it runs without the backend. The phone screen is a demo; no real phone is connected.
+On your computer, routes come from the backend. The online demo on Netlify still uses the **sample routes**, because the backend isn't hosted online yet. The starting battery level and safety scenarios are sample data, and the phone screen is a demo; no real phone is connected.
