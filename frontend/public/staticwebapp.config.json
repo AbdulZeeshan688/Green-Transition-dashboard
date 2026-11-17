@@ -1,0 +1,14 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/data/*", "/images/*", "/*.{svg,png,jpg,webp,ico,json}"]
+  },
+  "routes": [
+    { "route": "/data/*", "headers": { "Cache-Control": "no-cache" } },
+    { "route": "/assets/*", "headers": { "Cache-Control": "public, max-age=31536000, immutable" } }
+  ],
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  }
+}

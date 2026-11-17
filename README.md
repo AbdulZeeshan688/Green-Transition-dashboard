@@ -132,6 +132,14 @@ Then open **<http://localhost:5173/#route>**, search for a start and a destinati
 
 ---
 
+## Hosting on Azure
+
+The dashboard is moving to **Azure Static Web Apps** as part of the team's Azure pipeline (IoT Hub → Azure Functions in C# → REST API → Static Web App). The GitHub workflow in `.github/workflows/` tests, builds and deploys it on every merge to `main`, and gives every pull request its own preview site.
+
+Setup steps (once, in the team's Azure resource group): [docs/AZURE.md](docs/AZURE.md).
+
+---
+
 ## How to use it
 
 | Action | Keyboard | Mouse / touch |
@@ -218,7 +226,8 @@ Green-Transition-dashboard/
 ├── backend/           ← C# Azure Function: real routes (OpenRouteService), energy and CO₂
 │   ├── GreenTransition.Backend/        ← the API
 │   └── GreenTransition.Backend.Tests/  ← its tests
-├── docs/screenshots/  ← Pictures used in this README
+├── .github/workflows/ ← Azure Static Web App deployment (build, test, deploy)
+├── docs/              ← Azure hosting guide, integration guide, screenshots
 ├── Documents/         ← Reports, project plan and timesheets
 └── src/, index.html, package.json …  ← Earlier prototype by Unubold Luvsandagva (see below)
 ```
@@ -270,12 +279,14 @@ The full setup is in [`READMEfromOtherGroup.md`](READMEfromOtherGroup.md).
 - [x] Real map (Leaflet / OpenStreetMap) and search for any start and destination
 - [x] Route scores shown straight away, best route pre-selected
 - [x] Steering input ready for the CARLA team's wheel (Settings → Steering input)
-- [x] 79 automatic frontend tests
+- [x] 80 automatic frontend tests
 - [x] Dashboard hosted online on Netlify (`netlify.toml`)
 - [x] Real routes from the backend tested locally with an OpenRouteService key
 - [ ] Agree on one energy model for frontend and backend
 - [ ] Connect the real CARLA steering wheel
 - [ ] Live electricity CO₂ data from Fingrid
+- [x] Azure Static Web App pipeline ready (GitHub Actions workflow + `staticwebapp.config.json`)
+- [ ] Create the Static Web App in the team's Azure resource group and add the deploy token
 - [ ] Host the backend on Azure, so the online demo can show real routes too
 
 On your computer, routes come from the backend. The online demo on Netlify still uses the **sample routes**, because the backend isn't hosted online yet. The starting battery level and safety scenarios are sample data, and the phone screen is a demo; no real phone is connected.
