@@ -49,7 +49,16 @@ function backendProvider(config, fetchImpl) {
   };
 }
 
-export function createRouteProvider(sourceId, { routesData, integrations, fetchImpl = globalThis.fetch }) {
-  if (sourceId === 'backend') return backendProvider(integrations.routes.backend, fetchImpl);
+// VITE_BACKEND_URL (set at build time) points a hosted dashboard at the hosted
+// backend, e.g. https://<function-app>.azurewebsites.net. Locally it stays empty
+// and Vite forwards /api to localhost:8000.
+export function createRouteProvider(
+  sourceId,
+  { routesData, integrations, fetchImpl = globalThis.fetch, backendUrl = import.meta.env.VITE_BACKEND_URL },
+) {
+  if (sourceId === 'backend') {
+    const config = integrations.routes.backend;
+    return backendProvider({ ...config, baseUrl: backendUrl ? backendUrl.replace(/\/$/, '') : config.baseUrl }, fetchImpl);
+  }
   return localProvider(routesData);
 }

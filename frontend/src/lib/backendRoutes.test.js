@@ -136,4 +136,12 @@ describe('route providers', () => {
     await provider.searchPlaces('Lahti');
     expect(fetchImpl.mock.calls[0][0]).toBe('https://photon.test/api/?q=Lahti&limit=5&lang=en');
   });
+
+  it('backend provider uses a hosted backend address when one is given', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, json: async () => backendResponse }));
+    const backendUrl = 'https://green-api.azurewebsites.net/';
+    const provider = createRouteProvider('backend', { routesData, integrations, fetchImpl, backendUrl });
+    await provider.getRoutes(lahti, heinola);
+    expect(fetchImpl.mock.calls[0][0]).toBe('https://green-api.azurewebsites.net/api/routes');
+  });
 });
