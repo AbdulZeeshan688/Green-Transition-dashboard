@@ -28,4 +28,4 @@ jobs:
       api_location: ""
       output_location: "dist"
     env:
-      VITE_ROUTE_SOURCE: local
+      VITE_BACKEND_URL: https://emdt-greentransition-api-cyfdbbhtbmdwcpdb.westeurope-01.azurewebsites.net
