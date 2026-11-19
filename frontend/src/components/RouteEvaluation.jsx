@@ -123,10 +123,13 @@ export default function RouteEvaluation({
   const scores = useMemo(() => scoreRoutes(evaluated, scoring.metrics), [evaluated, scoring.metrics]);
   const bestId = bestRouteId(scores);
 
-  // New routes: start with the best-scoring one selected.
+  // New routes: start with the best-scoring one selected. This runs only when a
+  // new set of routes arrives, not on every re-render of the dashboard (the
+  // driving simulation re-renders it several times a second), so a route the
+  // user clicks stays selected.
   useEffect(() => {
     setSelectedId(bestId ?? candidates[0]?.id ?? null);
-  }, [scores]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [candidates]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selected = candidates.find((r) => r.id === selectedId);
   const labelOf = (id) => routeLabel(id, ecoId, fastestId);

@@ -88,7 +88,9 @@ export default function Dashboard({ data }) {
   const systems = systemsSummary(vehicleSystems.systems, scenario.states);
 
   const vehicleSpec = vehicles.find((v) => v.registrationNumber === registration) ?? vehicles[0];
-  const vehicle = { ...simulation.vehicleDefaults, ...vehicleSpec };
+  // Memoized so components that depend on the vehicle (route scores) don't
+  // recalculate on every simulation tick.
+  const vehicle = useMemo(() => ({ ...simulation.vehicleDefaults, ...vehicleSpec }), [simulation.vehicleDefaults, vehicleSpec]);
   const mode = driveModes.find((m) => m.id === modeId) ?? driveModes[0];
   const ready = power === 'ready' && !systems.drivingBlocked;
   const wheelCfg = integrations.driverInput.wheel;
