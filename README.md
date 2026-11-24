@@ -4,7 +4,7 @@ A web dashboard for an **electric vehicle digital twin**. It shows the car's liv
 
 Built as a group project for **LAB REDI 2026 (task 3.4)**, part of the **Electric Mobility Digital Twin (EMDT)** project by LAB University of Applied Sciences and LUT University.
 
-**▶ Live demo: https://green-transition-rg.netlify.app** (runs in any browser, no installation needed)
+**▶ Live demo: https://black-forest-00789f103.4.azurestaticapps.net** (fully hosted on Azure, with real routes. Runs in any browser, no installation needed)
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
@@ -134,9 +134,34 @@ Then open **<http://localhost:5173/#route>**, search for a start and a destinati
 
 ## Hosting on Azure
 
-The dashboard is moving to **Azure Static Web Apps** as part of the team's Azure pipeline (IoT Hub → Azure Functions in C# → REST API → Static Web App). The GitHub workflow in `.github/workflows/` tests, builds and deploys it on every merge to `main`, and gives every pull request its own preview site.
+The dashboard and its backend are fully hosted on Azure, in the team's resource group **rg_EMDT** (subscription LAB_EDU_IIT_4530306, region West Europe).
 
-Setup steps (once, in the team's Azure resource group): [docs/AZURE.md](docs/AZURE.md).
+| Part | Azure service | Address | Cost |
+|---|---|---|---|
+| Dashboard (`frontend/`) | Static Web App **dashboard**, Free plan | https://black-forest-00789f103.4.azurestaticapps.net | 0 € |
+| Routes API (`backend/`) | Function App **emdt-greentransition-api**, Flex Consumption, 512 MB, max 1 instance | https://emdt-greentransition-api-cyfdbbhtbmdwcpdb.westeurope-01.azurewebsites.net/api/routes | a few cents a month |
+| Storage for the Function App | Storage account **rgemdtb3cd** (needed by Azure Functions, not used by our code) | – | well under 1 € a month |
+
+The OpenRouteService key is an app setting (`ORS_API_KEY`) of the Function App, never in the code. The Function App only accepts browser calls from the dashboard's address (CORS). A 10 € monthly budget alert covers the resource group.
+
+### How updates go live
+
+- **Dashboard:** the source for the live site is the Azure DevOps repo **LahtiAILab / EMDTDashboard / GreenTransitionDashboard**. Every push to its `main` branch runs `azure-pipelines.yml`, which builds `frontend/` with the backend address (`VITE_BACKEND_URL`) and deploys it to the Static Web App. Nothing to click.
+- **Backend:** after a change in `backend/`, publish it from your computer (needs the .NET 10 SDK, Azure Functions Core Tools and the Azure CLI):
+  ```bash
+  az login        # choose the subscription LAB_EDU_IIT_4530306
+  cd backend/GreenTransition.Backend
+  func azure functionapp publish emdt-greentransition-api
+  ```
+
+### Keeping GitHub and Azure DevOps in sync
+
+This GitHub repo is a mirror. Push to both, so they stay the same:
+```bash
+git remote add azure https://LahtiAILab@dev.azure.com/LahtiAILab/EMDTDashboard/_git/GreenTransitionDashboard   # once
+git -c http.extraHeader="Authorization: Bearer $(az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv)" push azure main
+git push origin main
+```
 
 ---
 
@@ -226,7 +251,8 @@ Green-Transition-dashboard/
 ├── backend/           ← C# Azure Function: real routes (OpenRouteService), energy and CO₂
 │   ├── GreenTransition.Backend/        ← the API
 │   └── GreenTransition.Backend.Tests/  ← its tests
-├── .github/workflows/ ← Azure Static Web App deployment (build, test, deploy)
+├── azure-pipelines.yml ← Azure DevOps pipeline: builds and deploys the dashboard to Azure
+├── .github/workflows/ ← GitHub Actions check (tests and build only)
 ├── docs/              ← Azure hosting guide, integration guide, screenshots
 ├── Documents/         ← Reports, project plan and timesheets
 └── src/, index.html, package.json …  ← Earlier prototype by Unubold Luvsandagva (see below)
@@ -280,13 +306,13 @@ The full setup is in [`READMEfromOtherGroup.md`](READMEfromOtherGroup.md).
 - [x] Route scores shown straight away, best route pre-selected
 - [x] Steering input ready for the CARLA team's wheel (Settings → Steering input)
 - [x] 80 automatic frontend tests
-- [x] Dashboard hosted online on Netlify (`netlify.toml`)
 - [x] Real routes from the backend tested locally with an OpenRouteService key
 - [ ] Agree on one energy model for frontend and backend
 - [ ] Connect the real CARLA steering wheel
 - [ ] Live electricity CO₂ data from Fingrid
-- [x] Azure Static Web App pipeline ready (GitHub Actions workflow + `staticwebapp.config.json`)
-- [ ] Create the Static Web App in the team's Azure resource group and add the deploy token
-- [ ] Host the backend on Azure, so the online demo can show real routes too
+- [x] Dashboard hosted on Azure Static Web Apps, deployed by the Azure DevOps pipeline
+- [x] Backend hosted on Azure Functions (Flex Consumption) with the OpenRouteService key
+- [x] Online demo shows real routes from the hosted backend
+- [x] Route page keeps the route the user clicks selected
 
-On your computer, routes come from the backend. The online demo on Netlify still uses the **sample routes**, because the backend isn't hosted online yet. The starting battery level and safety scenarios are sample data, and the phone screen is a demo; no real phone is connected.
+Routes come from the backend, both online and on your computer. The starting battery level and safety scenarios are sample data, and the phone screen is a demo; no real phone is connected.
