@@ -8,6 +8,7 @@ Built as a group project for **LAB REDI 2026 (task 3.4)**, part of the **Electri
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
+Here is the link to the backlogs : https://github.com/users/AbdulZeeshan688/projects/4/views/1
 ---
 
 ## Team
